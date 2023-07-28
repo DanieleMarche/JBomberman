@@ -33,6 +33,10 @@ public class Sprites extends Observable {
         return a;
     }
 
+    public int getNumSprites() {
+        return numSprites;
+    }
+
     private BufferedImage loadImage(String path) {
         try {
             return ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(path)));
