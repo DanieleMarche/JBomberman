@@ -22,18 +22,15 @@ public class BombController extends AnimatedEntityController {
         this.explosionController = explosionController;
         spriteCoutner = 0;
 
-        collisionChecker = new CollisionChecker() {
-            @Override
-            public void checkCollision(MovingEntity movingEntity) {
-                for(Bomb bomb: gamePanel.getBombs()) {
+        collisionChecker = movingEntity -> {
+            for(Bomb bomb: gamePanel.getBombs()) {
 
-                    if(checkCollisionMovingAndNotMoving(movingEntity, bomb) && bomb.isPassedInto()) movingEntity.activateCollision();
+                if(checkCollisionMovingAndNotMoving(movingEntity, bomb) && bomb.isPassedInto()) movingEntity.activateCollision();
 
-                    if(!checkCollisionMovingAndNotMoving(movingEntity, bomb) && !bomb.isPassedInto()) bomb.hasPassedInto();
-
-                }
+                if(!checkCollisionMovingAndNotMoving(movingEntity, bomb) && !bomb.isPassedInto()) bomb.hasPassedInto();
 
             }
+
         };
     }
 
@@ -67,8 +64,8 @@ public class BombController extends AnimatedEntityController {
     }
 
     public void dropBomb () {
-        if(player.getBombAtSameTime() > 0) {
-            player.decreaseBombAtSameTime();
+        if(player.getRemainingBombsAtSameTime() > 0) {
+            player.decreaseRemainingBombsAtSameTime();
 
             Bomb b = new Bomb((((player.getWorldPositionX() + 10) / GamePanel.tileSize) * GamePanel.tileSize), (((player.getWorldPositionY() + 48) / GamePanel.tileSize) * GamePanel.tileSize));
             b.addObserver(gamePanel);
@@ -77,9 +74,9 @@ public class BombController extends AnimatedEntityController {
         }
     }
 
-    public void explode(Bomb bomb)  {
+    public void explode  (Bomb bomb)  {
         bomb.explode();
-        player.increaseBombAtSameTime();
+        player.increaseRemainingBombsAtSameTime();
         //explosionController.activateExplosion(bomb.getWorldPositionX() + 24, bomb.getWorldPositionY() + 24);
     }
 

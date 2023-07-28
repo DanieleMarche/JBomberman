@@ -18,6 +18,7 @@ public class Player extends MovingEntity {
         }
     }
     private int bombAtSameTime;
+    private int remainingBombsAtSameTime;
     private int explosionRadius;
 
     private boolean moving;
@@ -26,7 +27,7 @@ public class Player extends MovingEntity {
     private Player(int positionX, int positionY, int speed, String directoryName, String fileNames) {
         super(positionX, positionY, speed,13, 13, 2, 32, directoryName, fileNames, 3, 1);
 
-        bombAtSameTime = 1;
+        bombAtSameTime = remainingBombsAtSameTime = 1;
         explosionRadius = 1;
         moving = false;
         pixelCounter = 0;
@@ -80,6 +81,18 @@ public class Player extends MovingEntity {
 
     public void decreaseExplosionRadius() {
         explosionRadius--;
+    }
+
+    public int getRemainingBombsAtSameTime() {
+        return remainingBombsAtSameTime;
+    }
+
+    public void increaseRemainingBombsAtSameTime() {
+        remainingBombsAtSameTime ++;
+    }
+
+    public void decreaseRemainingBombsAtSameTime() {
+        remainingBombsAtSameTime --;
     }
 
     public void draw(Graphics2D g2) {
