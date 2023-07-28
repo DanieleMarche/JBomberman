@@ -10,13 +10,18 @@ import java.util.stream.Stream;
 
 public class Sprites extends Observable {
     protected ArrayList<BufferedImage> sprites;
+    protected final int numSprites;
 
     public Sprites(ArrayList<BufferedImage> sprites) {
+
         this.sprites = sprites;
+        numSprites = sprites.size();
     }
 
     public Sprites(String path, int numSprites) {
+
         sprites = loadImages(path, numSprites);
+        this.numSprites = numSprites;
     }
 
     private ArrayList<BufferedImage> loadImages (String path, int numSprites) {
