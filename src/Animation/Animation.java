@@ -7,13 +7,13 @@ import java.util.ArrayList;
 
 public class Animation extends Sprites implements Animate {
 
-    private int currSprite;
+    private int currentSprite;
     private final int defaultSpriteNum;
 
     public Animation(ArrayList<BufferedImage> sprites, int defaultSpriteNum) {
         super(sprites);
         this.defaultSpriteNum = defaultSpriteNum;
-        currSprite = 0;
+        currentSprite = 0;
 
     }
 
@@ -27,17 +27,17 @@ public class Animation extends Sprites implements Animate {
     }
 
     public BufferedImage getCurrentImage() {
-        return sprites.get(currSprite);
+        return sprites.get(currentSprite);
     }
 
-    public int getCurrSprite() {
-        return currSprite;
+    public int getCurrentSprite() {
+        return currentSprite;
     }
 
     @Override
     public void setNextSprite() {
-        if(currSprite == numSprites - 1) currSprite = 0;
-        else currSprite += 1;
+        if(currentSprite == numSprites - 1) currentSprite = 0;
+        else currentSprite += 1;
         setChanged();
         notifyObservers();
 
@@ -45,15 +45,15 @@ public class Animation extends Sprites implements Animate {
 
     @Override
     public void setDefaultSprite() {
-        currSprite = defaultSpriteNum;
+        currentSprite = defaultSpriteNum;
         setChanged();
         notifyObservers();
     }
 
     @Override
     public void setPreviousSprite() {
-        if(currSprite == 0) currSprite = numSprites - 1;
-        else currSprite -= 1;
+        if(currentSprite == 0) currentSprite = numSprites - 1;
+        else currentSprite -= 1;
         setChanged();
         notifyObservers();
     }
