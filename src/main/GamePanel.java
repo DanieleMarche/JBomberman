@@ -33,7 +33,7 @@ public class GamePanel extends JPanel implements Runnable, Observer {
 
     private final DestructibleBlocksController destructibleBlocksController;
     private final BombController bombController;
-    //private final ExplosionController explosionController;
+    private final ExplosionController explosionController;
     private final PlayerController playerController;
     private final GameStateController gameStateController;
 
@@ -80,12 +80,12 @@ public class GamePanel extends JPanel implements Runnable, Observer {
 
         tileManager = TileManager.getInstance(this, "/maps/level_1.txt");
 
-        destructibleBlocksController = new DestructibleBlocksController(this);
+        destructibleBlocksController = new DestructibleBlocksController(this, tileManager);
 
         CollisionDetector collisionDetector = new CollisionDetector(tileManager);
 
-        //explosionController = new ExplosionController(this, player, tileManager);
-        bombController = new BombController(this, player, null);
+        explosionController = new ExplosionController(this, player, tileManager);
+        bombController = new BombController(this, player, explosionController);
 
         playerController = new PlayerController(player, keyH, new PowerUpsController(this), bombController, collisionDetector, null);
 

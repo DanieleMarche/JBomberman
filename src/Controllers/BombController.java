@@ -13,12 +13,12 @@ public class BombController extends AnimatedEntityController {
     private final ExplosionController explosionController;
 
 
-    private int spriteCoutner;
+    private int spriteCounter;
     public BombController (GamePanel gamePanel, Player player, ExplosionController explosionController) {
         super(gamePanel);
         this.player = player;
         this.explosionController = explosionController;
-        spriteCoutner = 0;
+        spriteCounter = 0;
 
         collisionChecker = movingEntity -> {
             for(Bomb bomb: gamePanel.getBombs()) {
@@ -41,16 +41,14 @@ public class BombController extends AnimatedEntityController {
             Bomb b = i.next();
             Animation a = b.getCurrentAnimation();
 
-            spriteCoutner++;
-            if (spriteCoutner % 10 == 0) {
+            spriteCounter++;
+            if (spriteCounter % 10 == 0) {
 
-                if (a.getCurrSprite() < a.getNumSprites() - 1) {
-                    a.setNextSprite();
-                } else {
-                    if(b.isExploded()) i.remove();
-                    a.setDefaultSprite();
-                }
-                spriteCoutner = 0;
+                a.setNextSprite();
+
+                if(b.isExploded()) i.remove();
+
+                spriteCounter = 0;
             }
 
             b.increaseSeconds();
@@ -75,7 +73,7 @@ public class BombController extends AnimatedEntityController {
     public void explode  (Bomb bomb)  {
         bomb.explode();
         player.increaseRemainingBombsAtSameTime();
-        //explosionController.activateExplosion(bomb.getWorldPositionX() + 24, bomb.getWorldPositionY() + 24);
+        explosionController.activateExplosion(bomb.getWorldPositionX(), bomb.getWorldPositionY());
     }
 
 }

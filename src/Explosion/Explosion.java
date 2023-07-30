@@ -1,6 +1,7 @@
 package Explosion;
 
 import tile.DestructibleBlock;
+import tile.Tile;
 import tile.TileManager;
 import player.Player;
 import Animation.*;
@@ -12,7 +13,6 @@ import java.util.Observer;
 
 public class Explosion extends Observable {
 
-    private static Animation destructibleBlockExplosion;
     private final ArrayList<Flame>[] flameRadius;
     private static final int explosionTime = 120;
     private int secondsCount;
@@ -34,25 +34,28 @@ public class Explosion extends Observable {
     }
     private ArrayList<Flame> createFlameList(int row, int col, int rowIncrement, int colIncrement, int explosionRadius, TileManager tileManager, Observer gamePanel) {
         ArrayList<Flame> flameList = new ArrayList<>();
-        int tile;
+        Tile tile;
 
 
         for (int i = 1; i <= explosionRadius; i++) {
+
             row += rowIncrement;
             col += colIncrement;
-            tile = tileManager.getMapTileNum(row, col);
-            if (!tileManager.getTile(tile).doesGetOnFire()){
+            tile = tileManager.getTile(tileManager.getMapTileNum(row, col));
+
+            if (!tile.doesGetOnFire()){
                 break;
             }
-            flameList.add(new Flame(col * 48, row * 48, gamePanel));
-            if(tileManager.getTile(tile).isDestructible()) {
+
+            //flameList.add(new Flame(col * 48, row * 48, gamePanel));
+
+            if(tile.isDestructible()) {
                 DestructibleBlock db = DestructibleBlock.getIstance(col, row, 0);
                 db.explode();
                 break;
             }
 
         }
-
 
         return flameList;
     }
