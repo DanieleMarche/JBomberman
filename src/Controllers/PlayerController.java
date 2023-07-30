@@ -57,7 +57,7 @@ public class PlayerController {
 
             }
 
-            if(!keyHandler.isAMovementKeyPressed() && currentAnimation.getCurrSprite() != 1) {
+            if(!keyHandler.isAMovementKeyPressed() && currentAnimation.getCurrentSprite() != 1) {
                 if(spriteCounter % 10 != 0) currentAnimation.setDefaultSprite();
                 spriteCounter = 0;
             }
@@ -80,7 +80,7 @@ public class PlayerController {
 
             //if (keyHandler.isAMovementKeyPressed()) {
                 if (spriteCounter % 10 == 0) {
-                    switch (currentAnimation.getCurrSprite()) {
+                    switch (currentAnimation.getCurrentSprite()) {
                         case 2 -> {
                             currentAnimation.setPreviousSprite();
                             previousSpriteNum = 2;
