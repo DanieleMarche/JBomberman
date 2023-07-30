@@ -22,16 +22,20 @@ public class Animation extends Sprites implements Animate {
         this.defaultSpriteNum = defaultSpriteNum;
     }
 
-    public int getNumSprites() {
-        return numSprites;
-    }
-
     public BufferedImage getCurrentImage() {
         return sprites.get(currentSprite);
     }
 
     public int getCurrentSprite() {
         return currentSprite;
+    }
+
+    public int getDefaultSpriteNum() {
+        return defaultSpriteNum;
+    }
+
+    public boolean isLastSprite() {
+        return currentSprite == sprites.size() - 1;
     }
 
     @Override
