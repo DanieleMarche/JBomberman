@@ -3,8 +3,6 @@ package Controllers;
 import Animation.Animation;
 import Bomb.Bomb;
 import Controllers.ControllersGerarchy.AnimatedEntityController;
-import Controllers.ControllersGerarchy.CollisionChecker;
-import entityGerarchy.MovingEntity;
 import main.GamePanel;
 import player.Player;
 
