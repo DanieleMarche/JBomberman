@@ -20,6 +20,10 @@ public abstract class NotMovingAnimatedEntity extends Entity {
 
     }
 
+    public Animation getAnimation() {
+        return animation;
+    }
+
     public abstract void draw(Graphics2D g2, Player player);
 
 }
