@@ -64,7 +64,7 @@ public class GamePanel extends JPanel implements Runnable, Observer {
         AssetSetter assetSetter = new AssetSetter(this);
 
         powerUps = new ArrayList<>();
-        bombs = new ArrayList<>();
+        bombs = Bomb.bombs;
         explosions = new ArrayList<>();
 
         assetSetter.setObject();

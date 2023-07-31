@@ -6,12 +6,12 @@ import Controllers.ControllersGerarchy.AnimatedEntityController;
 import main.GamePanel;
 import player.Player;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 public class BombController extends AnimatedEntityController {
     private final Player player;
     private final ExplosionController explosionController;
-
 
     private int spriteCounter;
     public BombController (GamePanel gamePanel, Player player, ExplosionController explosionController) {
@@ -21,7 +21,7 @@ public class BombController extends AnimatedEntityController {
         spriteCounter = 0;
 
         collisionChecker = movingEntity -> {
-            for(Bomb bomb: gamePanel.getBombs()) {
+            for(Bomb bomb: Bomb.bombs) {
 
                 if(checkCollisionMovingAndNotMoving(movingEntity, bomb) && bomb.isPassedInto()) movingEntity.activateCollision();
 
@@ -35,27 +35,24 @@ public class BombController extends AnimatedEntityController {
     @Override
     public void updateAnimation() {
 
-        Iterator<Bomb> i = gamePanel.getBombs().iterator();
-
-        while(i.hasNext()) {
-            Bomb b = i.next();
-            Animation a = b.getCurrentAnimation();
+        for (Bomb b : Bomb.bombs) {
+            Animation a = b.getAnimation();
 
             spriteCounter++;
-            if (spriteCounter % 10 == 0) {
+            if (spriteCounter % 20 == 0) {
 
                 a.setNextSprite();
-
-                if(b.isExploded()) i.remove();
 
                 spriteCounter = 0;
             }
 
             b.increaseSeconds();
-            if(b.getSeconds() == b.getExplosionTime()) {
-                if(!b.isExploded()) explode(b);
+            if (b.getSeconds() == b.getExplosionTime()) {
+                if (!b.isExploded()) explode(b);
             }
         }
+
+        Bomb.bombs.removeIf(b -> b.isExploded());
 
     }
 
@@ -63,7 +60,7 @@ public class BombController extends AnimatedEntityController {
         if(player.getRemainingBombsAtSameTime() > 0) {
             player.decreaseRemainingBombsAtSameTime();
 
-            Bomb b = new Bomb((((player.getWorldPositionX() + 10) / GamePanel.tileSize) * GamePanel.tileSize), (((player.getWorldPositionY() + 48) / GamePanel.tileSize) * GamePanel.tileSize));
+            Bomb b = Bomb.getInstance((((player.getWorldPositionX() + 10) / GamePanel.tileSize) * GamePanel.tileSize), (((player.getWorldPositionY() + 48) / GamePanel.tileSize) * GamePanel.tileSize));
             b.addObserver(gamePanel);
 
             gamePanel.addBomb(b);

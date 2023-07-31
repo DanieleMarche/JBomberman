@@ -4,46 +4,51 @@ import entityGerarchy.NotMovingAnimatedEntity;
 import player.Player;
 import Animation.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 
 public class Bomb extends NotMovingAnimatedEntity {
 
-    private Animation currentAnimation;
-    private final Animation bombExplosionAnimation;
+    public static ArrayList<Bomb> bombs = new ArrayList<>();
     private boolean exploded;
     private boolean passedInto;
     private int seconds;
     private final int explosionTime;
 
-    public Bomb(int worldX, int worldY) {
-        super(worldX, worldY, 45, 40, 0, 0, "/Bomb/Bomb_0", 3);
+    public static Bomb getInstance(int worldX, int worldY) {
+
+        for(Bomb b: bombs) {
+            if(b.getWorldPositionX() == worldX && b.getWorldPositionY() == worldY) {
+                return b;
+            }
+        }
+
+        Bomb b = new Bomb(worldX, worldY);
+        bombs.add(b);
+        return b;
+
+    }
+
+    private Bomb(int worldX, int worldY) {
+        super(worldX, worldY, 48, 48, 0, 0, "/Bomb/Bomb_0", 3);
 
         exploded = false;
 
         passedInto = false;
-        explosionTime = 120;
-        currentAnimation = animation;
-        bombExplosionAnimation = new Animation("/Bomb/Bomb_Explosion/bomb_explosion_0", 5, 0);
+        explosionTime = 240;
+        //bombExplosionAnimation = new Animation("/Bomb/Bomb_Explosion/bomb_explosion_0", 5, 0);
 
     }
-
-
 
     public void explode() {
         exploded = true;
-        currentAnimation = bombExplosionAnimation;
-        resetSecondCounter();
-    }
-
-    public Animation getCurrentAnimation() {
-        return currentAnimation;
     }
 
     public boolean isExploded() {
         return exploded;
     }
 
-    public void resetSecondCounter() {
+    private void resetSecondCounter() {
         seconds = 0;
     }
 
@@ -62,6 +67,7 @@ public class Bomb extends NotMovingAnimatedEntity {
     public boolean isPassedInto() {
         return passedInto;
     }
+
     public void hasPassedInto() {
         passedInto = true;
     }
@@ -70,7 +76,7 @@ public class Bomb extends NotMovingAnimatedEntity {
         int screenX = worldPositionX;
         int screenY = worldPositionY;
 
-        g2.drawImage(currentAnimation.getCurrentImage(), screenX, screenY, 48, 48, null);
+        g2.drawImage(animation.getCurrentImage(), screenX, screenY, 48, 48, null);
 
     }
 }
