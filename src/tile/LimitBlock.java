@@ -1,48 +1,77 @@
 package tile;
 
 import Animation.*;
+import entityGerarchy.NotMovingEntity;
+import main.GamePanel;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class LimitBlock extends NotAnimatedMutlipleSpriteTile {
+public class LimitBlock extends NotMovingEntity {
 
-    public static LimitBlock limitBlock = null;
-
-    public static ArrayList<BufferedImage> limitBlocksUp;
-    public static ArrayList<BufferedImage> limitBlocksDown;
-    public static ArrayList<BufferedImage> limitBlocksLeft;
-    public static Collection<BufferedImage> limitBlocksRight;
-
-    public static LimitBlock getIstance() {
-        if(limitBlock == null) {
-            limitBlock = new LimitBlock();
-
-        }
-
-        return limitBlock;
+    public LimitBlock(int positionX, int positionY) {
+        super(positionX, positionY, GamePanel.tileSize, GamePanel.tileSize,  0, 0, findImage(positionX, positionY));
     }
 
-    private ArrayList<BufferedImage> loadLimitBlocks(int nImages, String directoryPath, String fileName, int mImages) {
-        ArrayList<BufferedImage> lb = new ArrayList<>();
+    private static BufferedImage findImage(int positionX, int positionY) {
+        int worldRow = positionY / GamePanel.tileSize;
+        int worldCol = positionX / GamePanel.tileSize;
+        String directoryPath = "/Blocks/limit/";
 
-        for (int i = 1; i <= nImages; i++) {
-            lb.add(loadImage(directoryPath + fileName + "_0" + i + ".png"));
-            
-        }
+        BufferedImage image = null;
 
-        if (mImages > 0) {
-            for (int i = 1; i <= mImages; i++) {
-                lb.add(mirrorImage(Objects.requireNonNull(loadImage(directoryPath + fileName + "_0" + i + ".png"))));
+        if (worldRow == 0) {
+            directoryPath += "up/limit_up_0";
+            switch (worldCol) {
+                case 0 -> image = loadImage(directoryPath + "1" + ".png");
+                case 1 -> image = loadImage(directoryPath + "2" + ".png");
+                case 14 -> image = mirrorImage(Objects.requireNonNull(loadImage(directoryPath + "1" + ".png")));
+                case 13 -> image = mirrorImage(Objects.requireNonNull(loadImage(directoryPath + "2" + ".png")));
+                default -> image = loadImage(directoryPath + "3" + ".png");
             }
         }
+        else if (worldRow == 12) {
+            directoryPath += "down/limit_down_0";
+            switch (worldCol) {
+                case 0 -> image = loadImage(directoryPath + "1" + ".png");
+                case 1 -> image = loadImage(directoryPath + "2" + ".png");
+                case 14 -> image = mirrorImage(Objects.requireNonNull(loadImage(directoryPath + "1" + ".png")));
+                case 13 -> image = mirrorImage(Objects.requireNonNull(loadImage(directoryPath + "2" + ".png")));
+                default -> image = loadImage(directoryPath + "3" + ".png");
+            }
+        } else {
+            directoryPath += "left/limit_left_0";
+            switch (worldCol) {
+                case 0 -> image = loadImage(directoryPath + "2" + ".png");
+                case 1 -> image = loadImage(directoryPath + "1" + ".png");
+                case 14 -> image = mirrorImage(Objects.requireNonNull(loadImage(directoryPath + "2" + ".png")));
+                case 13 -> image = mirrorImage(Objects.requireNonNull(loadImage(directoryPath + "1" + ".png")));
+            }
+        }
+        return image;
 
-        return lb;
+    }
+
+
+    public static BufferedImage loadImage(String imagePath) {
+        try {
+            // Carica l'immagine utilizzando ImageIO
+            URL imageUrl = LimitBlock.class.getResource(imagePath);
+            BufferedImage image = ImageIO.read(imageUrl);
+            return image;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static BufferedImage mirrorImage(BufferedImage image) {

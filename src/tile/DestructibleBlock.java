@@ -1,73 +1,47 @@
 package tile;
 
 import Animation.Animation;
+import entityGerarchy.NotMovingAnimatedEntity;
+import main.GamePanel;
+import player.Player;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-public class DestructibleBlock extends AnimatedMutlipleSpritesTile{
+public class DestructibleBlock extends NotMovingAnimatedEntity {
 
     public static ArrayList<DestructibleBlock> destructibleBlocks = new ArrayList<>();
 
-    private Animation currentAnimation;
-
-    private final int col;
-    private final int row;
-
     private boolean exploded;
 
-    public static DestructibleBlock getIstance(int col, int row, int numAnimation) {
+    public static DestructibleBlock getIstance(int x, int y, TileManager tileManager) {
         for(DestructibleBlock db: destructibleBlocks){
-            if(db.col == col && db.row == row) {
+            if(db.worldPositionX == x && db.worldPositionY == y) {
                 return db;
             }
         }
-        DestructibleBlock db = new DestructibleBlock(col, row, numAnimation);
+        DestructibleBlock db = new DestructibleBlock(x, y, tileManager);
         destructibleBlocks.add(db);
         return db;
     }
 
-    private DestructibleBlock(int col, int row, int numAnimation) {
-        super(true, true, false, 4);
-        this.row = row;
-        this.col = col;
+    private DestructibleBlock(int positionX, int positionY, TileManager tileManager) {
+        super(positionX, positionY, GamePanel.tileSize, GamePanel.tileSize, 0, 0, findPath(positionX, positionY, tileManager), 4);
 
         exploded = false;
 
-        animations.add(new Animation("/Blocks/destructable_block" + "/" + "destructable_block" + "_0", 4, 0));
-        animations.add(new Animation("/Blocks/destructable_block/with_shadow" + "/" + "destructible_block_shadow" + "_0", 4, 0));
-        animations.add(new Animation("/Explosion/destructible_block_explosion/destructible_block_explosion_0", 6, 5));
+    }
 
-        for(Animation a: animations) {
-            a.addObserver(TileManager.instance);
+    public static String findPath(int x, int y, TileManager tileManager) {
+        int row = y / GamePanel.tileSize;
+        int col = x / GamePanel.tileSize;
+
+        if(tileManager.getMapTileNum(row - 1, col) == 3 || tileManager.getMapTileNum(row - 1, col) == 1) {
+            return "/Blocks/destructable_block/with_shadow" + "/" + "destructible_block_shadow" + "_0";
         }
+        return "/Blocks/destructable_block" + "/" + "destructable_block" + "_0";
 
-        currentAnimation = animations.get(numAnimation);
-
-        collision = true;
-        destructible = true;
-        getOnFire = true;
-    }
-
-    public static boolean exist(int col, int row) {
-        for (DestructibleBlock db : destructibleBlocks) {
-            if (db.getCol() == col && db.getRow() == row) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static void removeDestructibleBlock(int col, int row) {
-        destructibleBlocks.removeIf(db -> db.getCol() == col && db.getRow() == row);
-    }
-
-    public int getCol() {
-        return col;
-    }
-
-    public int getRow() {
-        return row;
     }
 
     public boolean isExploded() {
@@ -75,16 +49,11 @@ public class DestructibleBlock extends AnimatedMutlipleSpritesTile{
     }
 
     public void explode() {
-        currentAnimation = animations.get(2);
         exploded = true;
     }
 
-    public Animation getCurrentAnimation() {
-        return currentAnimation;
-    }
 
     public BufferedImage getSprite() {
         return currentAnimation.getCurrentImage();
     }
-
 }
