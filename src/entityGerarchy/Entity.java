@@ -1,9 +1,11 @@
 package entityGerarchy;
 
+import Animation.Drawable;
+
 import java.awt.*;
 import java.util.Observable;
 
-public abstract class Entity extends Observable {
+public abstract class Entity extends Observable implements Drawable {
 
     protected int worldPositionX, worldPositionY;
 
