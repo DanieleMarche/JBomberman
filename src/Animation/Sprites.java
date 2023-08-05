@@ -8,6 +8,8 @@ import java.util.Objects;
 import java.util.Observable;
 import java.util.stream.Stream;
 
+import static Animation.ImageUtils.loadImage;
+
 public class Sprites extends Observable {
     protected ArrayList<BufferedImage> sprites;
     protected final int numSprites;
@@ -31,14 +33,6 @@ public class Sprites extends Observable {
         }
 
         return a;
-    }
-
-    private BufferedImage loadImage(String path) {
-        try {
-            return ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(path)));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public int getNumSprites() {

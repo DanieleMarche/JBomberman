@@ -2,7 +2,6 @@ package tile;
 
 import Animation.Animation;
 import main.GamePanel;
-
 import java.awt.*;
 
 public abstract class AnimatedTile extends Tile{

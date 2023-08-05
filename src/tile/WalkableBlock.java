@@ -1,13 +1,5 @@
 package tile;
 
-import Animation.Sprites;
-import entityGerarchy.NotMovingEntity;
-import main.GamePanel;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-
 public class WalkableBlock extends SingleImageTile {
 
     private static final String directoryPath = "/Blocks/walkable_block/walkable_block_0";
