@@ -6,7 +6,7 @@ import Explosion.Explosion;
 import PowerUp.PowerUp;
 import player.Player;
 import tile.DestructibleBlock;
-import tile.TileManager;
+import tile.Map;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,7 +27,7 @@ public class GamePanel extends JPanel implements Runnable, Observer {
     private Thread gameThread;
 
     private final Player player;
-    private final TileManager tileManager;
+    private final Map map;
 
     //Controllers
 
@@ -78,7 +78,7 @@ public class GamePanel extends JPanel implements Runnable, Observer {
         player = Player.getInstance(96, 24, 3);
         player.addObserver(this);
 
-        tileManager = TileManager.getInstance(this, "/maps/level_1.txt");
+        map = Map.getInstance(this, "/maps/level_1.txt");
 
         destructibleBlocksController = new DestructibleBlocksController(this, tileManager);
 
@@ -187,7 +187,7 @@ public class GamePanel extends JPanel implements Runnable, Observer {
 
         Graphics2D g2 = (Graphics2D) g;
 
-        tileManager.draw(g2);
+        map.draw(g2);
 
         //powerUps.forEach(pUps -> pUps.draw(g2, player));
 
