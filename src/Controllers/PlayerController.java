@@ -12,6 +12,7 @@ public class PlayerController {
     private ExplosionController explosionController;
     private final CollisionDetector collisionDetector;
 
+
     private Animation currentAnimation;
 
     private int spriteCounter;
@@ -53,7 +54,7 @@ public class PlayerController {
 
                 player.move();
 
-                player.deActivateCollision();
+                collisionDetector.checkCollision(player);
 
             }
 
@@ -64,7 +65,7 @@ public class PlayerController {
 
         }else {
 
-            collisionDetector.checkTile(player);
+
             //powerUpsController.collisionChecker.checkCollision(player);
             bombController.collisionChecker.checkCollision(player);
             //explosionController.collisionChecker.checkCollision(player);

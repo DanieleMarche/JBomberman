@@ -19,11 +19,7 @@ public abstract class NotMovingAnimatedEntity extends Entity {
         animation = new Animation(imageNotCompletedPath, numSprites, 0);
 
     }
-
     public Animation getAnimation() {
         return animation;
     }
-
-    public abstract void draw(Graphics2D g2, Player player);
-
 }

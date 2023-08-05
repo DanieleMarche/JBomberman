@@ -4,6 +4,8 @@ import entityGerarchy.Entity;
 import entityGerarchy.MovingEntity;
 import main.GamePanel;
 
+import java.awt.*;
+
 public abstract class EntityController {
     protected GamePanel gamePanel;
     public CollisionChecker collisionChecker;
@@ -14,33 +16,24 @@ public abstract class EntityController {
 
     }
 
-    protected boolean checkCollisionMovingAndNotMoving(MovingEntity movingEntity, Entity e) {
-        movingEntity.getSolidArea().x += movingEntity.getWorldPositionX();
-        movingEntity.getSolidArea().y += movingEntity.getWorldPositionY();
+    protected boolean checkCollisionMovingAndNotMoving(MovingEntity me, Entity e) {
 
-        e.getSolidArea().x += e.getWorldPositionX();
-        e.getSolidArea().y += e.getWorldPositionY();
+        Rectangle movingEntityBounds = (Rectangle) me.getBounds().clone();
 
-        switch(movingEntity.getDirection()) {
+        switch(me.getDirection()) {
 
-            case UP -> movingEntity.getSolidArea().y -= movingEntity.getSpeed();
+            case UP -> movingEntityBounds.y -= me.getSpeed();
 
-            case DOWN -> movingEntity.getSolidArea().y += movingEntity.getSpeed();
+            case DOWN -> movingEntityBounds.y += me.getSpeed();
 
-            case RIGHT -> movingEntity.getSolidArea().x += movingEntity.getSpeed();
+            case RIGHT -> movingEntityBounds.x += me.getSpeed();
 
-            case LEFT -> movingEntity.getSolidArea().x -= movingEntity.getSpeed();
+            case LEFT -> movingEntityBounds.x -= me.getSpeed();
         }
 
-        boolean res = movingEntity.getSolidArea().intersects(e.getSolidArea());
+        
 
-        movingEntity.getSolidArea().x = movingEntity.getSolidAreaDefaultX();
-        movingEntity.getSolidArea().y = movingEntity.getSolidAreaDefaultY();
-
-        e.getSolidArea().x = e.getSolidAreaDefaultX();
-        e.getSolidArea().y = e.getSolidAreaDefaultY();
-
-        return res;
+        return movingEntityBounds.intersects(e.getSolidArea());
     };
 
 }

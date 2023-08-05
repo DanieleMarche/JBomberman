@@ -1,6 +1,7 @@
 package entityGerarchy;
 
 import Animation.*;
+import main.GamePanel;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -91,6 +92,10 @@ public abstract class MovingEntity extends Entity{
         notifyObservers();
     }
 
+    public Rectangle getBounds() {
+        return new Rectangle(worldPositionX + solidArea.x, worldPositionY + solidArea.y, solidArea.width, solidArea.height);
+    }
+
     public void updateCurrentAnimation() {
         switch(direction) {
             case UP -> currentAnimation = backAnimation;
@@ -120,6 +125,14 @@ public abstract class MovingEntity extends Entity{
         return leftSideAnimation;
     }
 
+    public int getRow() {
+        return (worldPositionY + solidArea.y + 1) / GamePanel.tileSize;
+    }
+
+    public int getCol(){
+        return (worldPositionX + solidArea.x + 1) / GamePanel.tileSize;
+    }
+
     public Animation getDeathAnimation() {
         return deathAnimation;
     }
@@ -127,7 +140,5 @@ public abstract class MovingEntity extends Entity{
     public void increaseSpeed() {
         speed++;
     }
-
-    public abstract void draw(Graphics2D g2);
 }
 

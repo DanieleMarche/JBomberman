@@ -1,67 +1,58 @@
 package Controllers;
 
 import entityGerarchy.MovingEntity;
-import main.GamePanel;
-import tile.TileManager;
+import entityGerarchy.NotMovingEntity;
+import tile.Map;
 import tile.Tile;
 
+import java.awt.*;
+
 public class CollisionDetector {
-    private final TileManager tileManager;
 
-    public CollisionDetector(TileManager tileManager) {
-        this.tileManager = tileManager;
+    DestructibleBlocksController destructibleBlocksController;
+    private final Map map;
+
+    public CollisionDetector(Map map, DestructibleBlocksController destructibleBlocksController) {
+
+        this.map = map;
+        this.destructibleBlocksController = destructibleBlocksController;
     }
 
+    public void checkCollision(MovingEntity me) {
+        checkTile(me);
+    }
+
+    /**
+     * @param movingEntity
+     * This functions takes a Moving Entity as a parameter and checks if it is colliding with a NotMovingEntity inside
+     * the map matrix of the tileManager;
+     **/
     public void checkTile(MovingEntity movingEntity) {
-        int entityLeftWorldX = movingEntity.getWorldPositionX() + movingEntity.getSolidArea().x;
-        int entityRightWorldX = movingEntity.getWorldPositionX() + movingEntity.getSolidArea().x + movingEntity.getSolidArea().width * GamePanel.tileScale;
-        int entityTopWorldY = movingEntity.getWorldPositionY() + movingEntity.getSolidArea().y;
-        int entityBottomWorldY = movingEntity.getWorldPositionY() + movingEntity.getSolidArea().y + movingEntity.getSolidArea().height * GamePanel.tileScale;
 
-        int entityLeftCol = entityLeftWorldX / GamePanel.tileSize;
-        int entityRightCol = entityRightWorldX / GamePanel.tileSize;
-        int entityTopRow = entityTopWorldY / GamePanel.tileSize;
-        int entityBottomRow = entityBottomWorldY / GamePanel.tileSize;
+        int movingEntityRow = movingEntity.getRow();
+        int movingEntityCol = movingEntity.getCol();
 
-        int[][] tileNums = new int[2][2];
-
+        int[] collisionCoordinates = null;
         switch (movingEntity.getDirection()) {
-            case UP -> {
-                entityTopRow = (entityTopWorldY - movingEntity.getSpeed()) / GamePanel.tileSize;
-                tileNums[0] = new int[]{entityTopRow, entityLeftCol};
-                tileNums[1] = new int[]{entityTopRow, entityRightCol};
-            }
-            case DOWN -> {
-                entityBottomRow = (entityBottomWorldY + movingEntity.getSpeed()) / GamePanel.tileSize;
-                tileNums[0] = new int[]{entityBottomRow, entityLeftCol};
-                tileNums[1] = new int[]{entityBottomRow, entityRightCol};
-            }
-            case LEFT -> {
-                entityLeftCol = (entityLeftWorldX - movingEntity.getSpeed()) / GamePanel.tileSize;
-                tileNums[0] = new int[]{entityTopRow, entityLeftCol};
-                tileNums[1] = new int[]{entityBottomRow, entityLeftCol};
-            }
-            case RIGHT -> {
-                entityRightCol = (entityRightWorldX + movingEntity.getSpeed()) / GamePanel.tileSize;
-                tileNums[0] = new int[]{entityTopRow, entityRightCol};
-                tileNums[1] = new int[]{entityBottomRow, entityRightCol};
-            }
+            case UP -> collisionCoordinates = new int[]{movingEntityRow - 1, movingEntityCol};
+            case DOWN -> collisionCoordinates = new int[]{movingEntityRow + 1, movingEntityCol};
+            case LEFT -> collisionCoordinates = new int[]{movingEntityRow, movingEntityCol - 1};
+            case RIGHT -> collisionCoordinates = new int[]{movingEntityRow, movingEntityCol + 1};
         }
 
+        if (collisionCoordinates != null) {
+            int row = collisionCoordinates[0];
+            int col = collisionCoordinates[1];
 
-        for (int[] tileNum : tileNums) {
-            if (tileNum.length == 2) {
-                int row = tileNum[0];
-                int col = tileNum[1];
-                Tile tile = tileManager.getTile(tileManager.getMapTileNum(row, col));
-                if (tile != null && tile.getCollision()) {
-                    movingEntity.activateCollision();
+            Tile tile = map.getTile(row, col);
 
-                    break;
-                }
+            if(tile != null && tile.isSolid()) {
+                movingEntity.activateCollision();
+            }
+            else {
+                movingEntity.deActivateCollision();
             }
         }
 
     }
-
 }

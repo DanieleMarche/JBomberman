@@ -25,7 +25,7 @@ public class Player extends MovingEntity {
     private int pixelCounter;
 
     private Player(int positionX, int positionY, int speed, String directoryName, String fileNames) {
-        super(positionX, positionY, speed,13, 13, 2, 32, directoryName, fileNames, 3, 1);
+        super(positionX, positionY, speed, GamePanel.tileSize, GamePanel.tileSize, 0, 26, directoryName, fileNames, 3, 1);
 
         bombAtSameTime = remainingBombsAtSameTime = 1;
         explosionRadius = 1;
