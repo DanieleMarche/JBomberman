@@ -8,19 +8,19 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-public class WalkableBlock extends NotMovingEntity {
+public class WalkableBlock extends SingleImageTile {
 
     private static final String directoryPath = "/Blocks/walkable_block/walkable_block_0";
 
-    public WalkableBlock (int positionX, int positionY, boolean isUnderLimitSolidOrDestructibleBlocks) {
+    public WalkableBlock (int row, int col, boolean isUnderLimitSolidOrDestructibleBlocks) {
 
-        super(positionX, positionY, findImagePath(isUnderLimitSolidOrDestructibleBlocks));
+        super(row, col, false, false, true, findImagePath(isUnderLimitSolidOrDestructibleBlocks));
 
     }
 
-    public WalkableBlock (int positionX, int positionY) {
+    public WalkableBlock (int row, int col) {
 
-        super(positionX, positionY, directoryPath + "1.png");
+        super(row, col, false, false, true, directoryPath + "1.png");
 
     }
 
@@ -30,10 +30,5 @@ public class WalkableBlock extends NotMovingEntity {
         }else {
             return directoryPath + "3.png";
         }
-    }
-
-    @Override
-    public BufferedImage getImage(int index) {
-        return sprites.getImage(index);
     }
 }

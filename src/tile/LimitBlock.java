@@ -16,15 +16,13 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class LimitBlock extends NotMovingEntity {
+public class LimitBlock extends SingleImageTile {
 
-    public LimitBlock(int positionX, int positionY) {
-        super(positionX, positionY, GamePanel.tileSize, GamePanel.tileSize,  0, 0, findImage(positionX, positionY));
+    public LimitBlock(int row, int col) {
+        super(row, col, true, false, false, findImage(row, col));
     }
 
-    private static BufferedImage findImage(int positionX, int positionY) {
-        int worldRow = positionY / GamePanel.tileSize;
-        int worldCol = positionX / GamePanel.tileSize;
+    private static BufferedImage findImage(int worldRow, int worldCol) {
         String directoryPath = "/Blocks/limit/";
 
         BufferedImage image = null;
@@ -61,7 +59,6 @@ public class LimitBlock extends NotMovingEntity {
 
     }
 
-
     public static BufferedImage loadImage(String imagePath) {
         try {
             // Carica l'immagine utilizzando ImageIO
@@ -89,31 +86,5 @@ public class LimitBlock extends NotMovingEntity {
         }
 
         return mirroredImage;
-    }
-
-    private LimitBlock() {
-        
-        super( true, false, false);
-
-        String directoryPath = "/Blocks/limit";
-
-        limitBlocksUp = loadLimitBlocks(3, directoryPath + "/up", "/limit_up", 2);
-        limitBlocksDown = loadLimitBlocks(3, directoryPath + "/down","/limit_down", 2);
-        limitBlocksLeft = loadLimitBlocks(2, directoryPath + "/left", "/limit_left", 0);
-
-        limitBlocksRight = limitBlocksLeft.stream().map(LimitBlock::mirrorImage).collect(Collectors.toCollection(ArrayList::new));
-
-        ArrayList<BufferedImage> a = new ArrayList<>();
-        a.addAll(limitBlocksUp);
-        a.addAll(limitBlocksLeft);
-        a.addAll(limitBlocksRight);
-        a.addAll(limitBlocksDown);
-
-        sprites = new Sprites(a);
-    }
-
-    @Override
-    public BufferedImage getImage(int index) {
-        return sprites.getImage(index);
     }
 }
