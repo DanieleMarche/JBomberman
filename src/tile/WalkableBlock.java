@@ -1,5 +1,7 @@
 package tile;
 
+import tile.tileGerarchy.SingleImageTile;
+
 public class WalkableBlock extends SingleImageTile {
 
     private static final String directoryPath = "/Blocks/walkable_block/walkable_block_0";

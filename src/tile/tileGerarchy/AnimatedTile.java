@@ -1,10 +1,12 @@
-package tile;
+package tile.tileGerarchy;
 
 import Animation.Animation;
 import main.GamePanel;
+import tile.tileGerarchy.Tile;
+
 import java.awt.*;
 
-public abstract class AnimatedTile extends Tile{
+public abstract class AnimatedTile extends Tile {
 
     protected Animation animation;
 

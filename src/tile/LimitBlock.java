@@ -1,5 +1,7 @@
 package tile;
 
+import tile.tileGerarchy.SingleImageTile;
+
 import java.awt.image.BufferedImage;
 import java.util.Objects;
 import static Animation.ImageUtils.loadImage;

@@ -1,11 +1,13 @@
-package tile;
+package tile.tileGerarchy;
 
 import Animation.ImageUtils;
 import main.GamePanel;
+import tile.tileGerarchy.Tile;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public abstract class SingleImageTile extends Tile{
+public abstract class SingleImageTile extends Tile {
 
     protected BufferedImage image;
 

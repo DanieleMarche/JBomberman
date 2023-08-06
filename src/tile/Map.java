@@ -1,7 +1,7 @@
 package tile;
 
-import entityGerarchy.NotMovingEntity;
 import main.GamePanel;
+import tile.tileGerarchy.Tile;
 
 import java.awt.*;
 import java.io.BufferedReader;
@@ -85,14 +85,14 @@ public class Map extends Observable implements Observer{
 
                 switch (tileNum) {
                     case 0 -> {
-                        if(getMapTileNum(row - 1, col) == 2 ) map[row][col] = new WalkableBlock(row, col, false);
+                        if(map[row - 1] [col] instanceof DestructibleBlock ) map[row][col] = new WalkableBlock(row, col, false);
                         else if(getMapTileNum(row - 1, col) == 3 ) map[row][col] = new WalkableBlock(row, col, true);
                         else map[row][col] = new WalkableBlock(row, col);
                     }
                     case 1 -> map[row][col] = new LimitBlock(row, col);
 
                     case 2 -> {
-                        if(getMapTileNum(row - 1, col) == 2 || getMapTileNum(row - 1, col) == 1) map[row][col] = new DestructibleBlock(row, col, true);
+                        if(getMapTileNum(row - 1, col) == 3 || getMapTileNum(row - 1, col) == 1) map[row][col] = new DestructibleBlock(row, col, true);
                         else map[row][col] = new DestructibleBlock(row, col, false);
                     }
 

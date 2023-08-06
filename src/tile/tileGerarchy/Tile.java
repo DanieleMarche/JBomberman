@@ -1,4 +1,4 @@
-package tile;
+package tile.tileGerarchy;
 
 import Animation.Drawable;
 import main.GamePanel;

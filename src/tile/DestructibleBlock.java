@@ -1,9 +1,7 @@
 package tile;
 
-import entityGerarchy.NotMovingAnimatedEntity;
-import main.GamePanel;
+import tile.tileGerarchy.AnimatedTile;
 
-import java.awt.*;
 import java.util.ArrayList;
 
 public class DestructibleBlock extends AnimatedTile {
@@ -23,9 +21,8 @@ public class DestructibleBlock extends AnimatedTile {
 
     public static String findPath(boolean type) {
 
-        if(type) {
-            return "/Blocks/destructable_block/with_shadow" + "/" + "destructible_block_shadow" + "_0";
-        }
+        if(type) return "/Blocks/destructable_block/with_shadow" + "/" + "destructible_block_shadow" + "_0";
+
         return "/Blocks/destructable_block" + "/" + "destructable_block" + "_0";
 
     }

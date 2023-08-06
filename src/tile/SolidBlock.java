@@ -1,9 +1,6 @@
 package tile;
 
-import entityGerarchy.NotMovingEntity;
-import main.GamePanel;
-
-import java.awt.*;
+import tile.tileGerarchy.SingleImageTile;
 
 public class SolidBlock extends SingleImageTile {
 

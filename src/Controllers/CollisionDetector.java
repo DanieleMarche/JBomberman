@@ -1,11 +1,8 @@
 package Controllers;
 
 import entityGerarchy.MovingEntity;
-import entityGerarchy.NotMovingEntity;
 import tile.Map;
-import tile.Tile;
-
-import java.awt.*;
+import tile.tileGerarchy.Tile;
 
 public class CollisionDetector {
 
