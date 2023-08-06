@@ -34,7 +34,7 @@ public class Map extends Observable implements Observer{
         map = new Tile[GamePanel.maxWorldRow][GamePanel.maxWorldCol];
 
         loadMap();
-        printMap();
+        //printMap();
     }
 
     public void printMap() {
