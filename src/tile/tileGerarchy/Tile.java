@@ -2,8 +2,11 @@ package tile.tileGerarchy;
 
 import Animation.Drawable;
 import main.GamePanel;
+import tile.TileType;
 
 public abstract class Tile implements Drawable {
+
+    protected TileType tileType;
     protected boolean solid;
     protected boolean explodable;
     protected boolean getFire;
@@ -12,7 +15,8 @@ public abstract class Tile implements Drawable {
 
     protected int row;
 
-    public Tile(int row, int col, boolean solid, boolean explodable, boolean getFire) {
+    public Tile(TileType tileType, int row, int col, boolean solid, boolean explodable, boolean getFire) {
+        this.tileType = tileType;
         this.row = row;
         this.col = col;
         this.solid = solid;

@@ -2,6 +2,7 @@ package tile.tileGerarchy;
 
 import Animation.ImageUtils;
 import main.GamePanel;
+import tile.TileType;
 import tile.tileGerarchy.Tile;
 
 import java.awt.*;
@@ -11,13 +12,13 @@ public abstract class SingleImageTile extends Tile {
 
     protected BufferedImage image;
 
-    public SingleImageTile(int row, int col, boolean solid, boolean explodable, boolean getFire, BufferedImage image) {
-        super(row, col, solid, explodable, getFire);
+    public SingleImageTile(TileType tileType, int row, int col, boolean solid, boolean explodable, boolean getFire, BufferedImage image) {
+        super(tileType, row, col, solid, explodable, getFire);
         this.image = image;
     }
 
-    public SingleImageTile(int row, int col, boolean solid, boolean explodable, boolean getFire, String imagePath) {
-        super(row, col, solid, explodable, getFire);
+    public SingleImageTile(TileType tileType, int row, int col, boolean solid, boolean explodable, boolean getFire, String imagePath) {
+        super(tileType, row, col, solid, explodable, getFire);
 
         image = ImageUtils.loadImage(imagePath);
     }

@@ -15,7 +15,7 @@ public class Map extends Observable implements Observer{
 
     public static Map instance;
 
-    private int[][] mapTileNum;
+    private TileType[][] mapTileNum;
 
     private Tile[][] map;
 
@@ -51,12 +51,12 @@ public class Map extends Observable implements Observer{
         }
     }
 
-    public int getMapTileNum(int y, int x) {
+    public TileType getMapTileNum(int y, int x) {
         return mapTileNum[y][x];
     }
 
     private void loadNumMap(String mapName) {
-        try{
+        try {
             InputStream is = getClass().getResourceAsStream(mapName);
             assert is != null;
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -65,15 +65,25 @@ public class Map extends Observable implements Observer{
                     .map(line -> line.split(" "))
                     .map(line -> Arrays.stream(line)
                             .mapToInt(Integer::parseInt)
-                            .toArray())
-                    .toArray(int[][]::new);
+                            .mapToObj(this::getTileTypeFromNumber) // Converti i numeri in TileType
+                            .toArray(TileType[]::new))
+                    .toArray(TileType[][]::new);
 
             br.close();
 
-        }catch(Exception e) {
+        } catch (Exception e) {
             System.out.println("problema");
-
         }
+    }
+
+    private TileType getTileTypeFromNumber(int number) {
+        return switch (number) {
+            case 0 -> TileType.WALKABLE_BLOCK;
+            case 1 -> TileType.LIMIT_BLOCK;
+            case 2 -> TileType.DESTRUCTIBLE_BLOCK;
+            case 3 -> TileType.SOLID_BLOCK;
+            default -> throw new IllegalArgumentException("Numero sconosciuto: " + number);
+        };
     }
 
     private void loadMap() {
@@ -81,30 +91,28 @@ public class Map extends Observable implements Observer{
         for(int row = 0; row< mapTileNum.length; row++) {
             for(int col = 0; col< mapTileNum[0].length; col++) {
 
-                int tileNum = mapTileNum[row][col];
-
-                switch (tileNum) {
-                    case 0 -> {
+                switch (mapTileNum[row][col]) {
+                    case WALKABLE_BLOCK -> {
                         if(map[row - 1] [col] instanceof DestructibleBlock ) map[row][col] = new WalkableBlock(row, col, false);
-                        else if(getMapTileNum(row - 1, col) == 1) map[row][col] = new WalkableBlock(row, col, true);
+                        else if(getMapTileNum(row - 1, col) == TileType.LIMIT_BLOCK || getMapTileNum(row - 1, col) == TileType.SOLID_BLOCK) map[row][col] = new WalkableBlock(row, col, true);
                         else map[row][col] = new WalkableBlock(row, col);
                     }
-                    case 1 -> map[row][col] = new LimitBlock(row, col);
+                    case LIMIT_BLOCK -> map[row][col] = new LimitBlock(row, col);
 
-                    case 2 -> {
-                        if(getMapTileNum(row - 1, col) == 3 || getMapTileNum(row - 1, col) == 1) map[row][col] = new DestructibleBlock(row, col, true);
+                    case DESTRUCTIBLE_BLOCK -> {
+                        if(getMapTileNum(row - 1, col) == TileType.SOLID_BLOCK || getMapTileNum(row - 1, col) == TileType.LIMIT_BLOCK) map[row][col] = new DestructibleBlock(row, col, true);
                         else map[row][col] = new DestructibleBlock(row, col, false);
                     }
 
-                    case 3 -> map[row][col] = new SolidBlock(row, col);
+                    case SOLID_BLOCK -> map[row][col] = new SolidBlock(row, col);
                 }
             }
         }
 
     }
 
-    public void setTile(int y, int x, int numTile) {
-        mapTileNum[y][x] = numTile;
+    public void setTile(int y, int x, TileType tileType) {
+        mapTileNum[y][x] = tileType;
         setChanged();
         notifyObservers();
     }

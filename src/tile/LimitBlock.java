@@ -10,7 +10,7 @@ import static Animation.ImageUtils.mirrorImage;
 public class LimitBlock extends SingleImageTile {
 
     public LimitBlock(int row, int col) {
-        super(row, col, true, false, false, findImage(row, col));
+        super(TileType.LIMIT_BLOCK, row, col, true, false, false, findImage(row, col));
     }
 
     private static BufferedImage findImage(int worldRow, int worldCol) {

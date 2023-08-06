@@ -1,5 +1,4 @@
 package tile;
-
 import tile.tileGerarchy.SingleImageTile;
 
 public class WalkableBlock extends SingleImageTile {
@@ -8,13 +7,13 @@ public class WalkableBlock extends SingleImageTile {
 
     public WalkableBlock (int row, int col, boolean isUnderLimitSolidOrDestructibleBlocks) {
 
-        super(row, col, false, false, true, findImagePath(isUnderLimitSolidOrDestructibleBlocks));
+        super(TileType.WALKABLE_BLOCK, row, col, false, false, true, findImagePath(isUnderLimitSolidOrDestructibleBlocks));
 
     }
 
     public WalkableBlock (int row, int col) {
 
-        super(row, col, false, false, true, directoryPath + "1.png");
+        super(TileType.WALKABLE_BLOCK, row, col, false, false, true, directoryPath + "1.png");
 
     }
 

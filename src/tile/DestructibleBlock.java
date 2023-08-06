@@ -11,7 +11,7 @@ public class DestructibleBlock extends AnimatedTile {
     private boolean exploded;
 
     public DestructibleBlock(int row, int col, boolean imageType) {
-        super(row, col, true, true, true, findPath(imageType), 4);
+        super(TileType.WALKABLE_BLOCK, row, col, true, true, true, findPath(imageType), 4);
 
         exploded = false;
 
