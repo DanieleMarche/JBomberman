@@ -21,19 +21,17 @@ public abstract class EntityController {
         Rectangle movingEntityBounds = (Rectangle) me.getBounds().clone();
 
         switch(me.getDirection()) {
-
             case UP -> movingEntityBounds.y -= me.getSpeed();
-
             case DOWN -> movingEntityBounds.y += me.getSpeed();
-
-            case RIGHT -> movingEntityBounds.x += me.getSpeed();
-
             case LEFT -> movingEntityBounds.x -= me.getSpeed();
+            case RIGHT -> movingEntityBounds.x += me.getSpeed();
         }
 
-        
+        return movingEntityBounds.intersects(e.getBounds());
+    }
 
-        return movingEntityBounds.intersects(e.getSolidArea());
-    };
+    public CollisionChecker getCollisionChecker() {
+        return collisionChecker;
+    }
 
 }
