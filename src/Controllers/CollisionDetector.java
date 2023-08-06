@@ -29,27 +29,28 @@ public class CollisionDetector {
         int movingEntityRow = movingEntity.getRow();
         int movingEntityCol = movingEntity.getCol();
 
-        int[] collisionCoordinates = null;
+        int[] collisionCoordinates;
+
         switch (movingEntity.getDirection()) {
             case UP -> collisionCoordinates = new int[]{movingEntityRow - 1, movingEntityCol};
             case DOWN -> collisionCoordinates = new int[]{movingEntityRow + 1, movingEntityCol};
             case LEFT -> collisionCoordinates = new int[]{movingEntityRow, movingEntityCol - 1};
             case RIGHT -> collisionCoordinates = new int[]{movingEntityRow, movingEntityCol + 1};
+            default -> throw new IllegalStateException("Unexpected value: " + movingEntity.getDirection());
         }
 
-        if (collisionCoordinates != null) {
-            int row = collisionCoordinates[0];
-            int col = collisionCoordinates[1];
+        int row = collisionCoordinates[0];
+        int col = collisionCoordinates[1];
 
-            Tile tile = map.getTile(row, col);
+        Tile tile = map.getTile(row, col);
 
-            if(tile != null && tile.isSolid()) {
-                movingEntity.activateCollision();
-            }
-            else {
-                movingEntity.deActivateCollision();
-            }
+        if(tile.isSolid()) {
+            movingEntity.activateCollision();
         }
+        else {
+            movingEntity.deActivateCollision();
+        }
+
 
     }
 }
