@@ -1,22 +1,19 @@
 package Controllers;
 
+import Controllers.ControllersGerarchy.CollisionChecker;
 import entityGerarchy.MovingEntity;
 import tile.Map;
 import tile.tileGerarchy.Tile;
 
 public class CollisionDetector {
 
-    DestructibleBlocksController destructibleBlocksController;
     private final Map map;
+    private final CollisionChecker bombCollisionChecker;
 
-    public CollisionDetector(Map map, DestructibleBlocksController destructibleBlocksController) {
+    public CollisionDetector(Map map, BombController bombController) {
 
         this.map = map;
-        this.destructibleBlocksController = destructibleBlocksController;
-    }
-
-    public void checkCollision(MovingEntity me) {
-        checkTile(me);
+        this.bombCollisionChecker = bombController.getCollisionChecker();
     }
 
     /**
@@ -24,7 +21,7 @@ public class CollisionDetector {
      * This functions takes a Moving Entity as a parameter and checks if it is colliding with a NotMovingEntity inside
      * the map matrix of the tileManager;
      **/
-    public void checkTile(MovingEntity movingEntity) {
+    public void checkCollisionWithTiles(MovingEntity movingEntity) {
 
         int movingEntityRow = movingEntity.getRow();
         int movingEntityCol = movingEntity.getCol();
@@ -53,4 +50,10 @@ public class CollisionDetector {
 
 
     }
+
+    public void checkCollisionWithNotMovingEntities(MovingEntity me) {
+        bombCollisionChecker.checkCollision(me);
+    }
+
+
 }
