@@ -21,6 +21,10 @@ public abstract class Entity extends Observable implements Drawable {
 
     public abstract int getCol();
 
+    public Rectangle getBounds() {
+        return new Rectangle(worldPositionX + solidArea.x, worldPositionY + solidArea.y, solidArea.width, solidArea.height);
+    }
+
     public int getWorldPositionX() {
         return worldPositionX;
     }

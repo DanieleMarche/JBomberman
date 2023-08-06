@@ -92,10 +92,6 @@ public abstract class MovingEntity extends Entity{
         notifyObservers();
     }
 
-    public Rectangle getBounds() {
-        return new Rectangle(worldPositionX + solidArea.x, worldPositionY + solidArea.y, solidArea.width, solidArea.height);
-    }
-
     public void updateCurrentAnimation() {
         switch(direction) {
             case UP -> currentAnimation = backAnimation;
@@ -126,11 +122,11 @@ public abstract class MovingEntity extends Entity{
     }
 
     public int getRow() {
-        return (worldPositionY + solidArea.y + 1) / GamePanel.tileSize;
+        return (worldPositionY + solidArea.y) / GamePanel.tileSize;
     }
 
     public int getCol(){
-        return (worldPositionX + solidArea.x + 1) / GamePanel.tileSize;
+        return (worldPositionX + solidArea.x) / GamePanel.tileSize;
     }
 
     public Animation getDeathAnimation() {
