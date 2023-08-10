@@ -9,7 +9,10 @@ public abstract class Entity extends Observable implements Drawable {
 
     protected int worldPositionX, worldPositionY;
 
-    protected Rectangle solidArea;
+    /**
+     * This property defines the part of the entity that is solid.
+     */
+    private final Rectangle solidArea;
 
     public Entity(int worldPositionX, int worldPositionY,int rectangleWidth, int rectangleHeight, int solidAreaDefaultX, int solidAreaDefaultY) {
         this.worldPositionX = worldPositionX;

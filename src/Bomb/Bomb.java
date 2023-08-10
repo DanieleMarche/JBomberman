@@ -1,21 +1,21 @@
 package Bomb;
 
 import entityGerarchy.NotMovingAnimatedEntity;
+import main.GamePanel;
 import player.Player;
 import Animation.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 
 public class Bomb extends NotMovingAnimatedEntity {
 
     public static ArrayList<Bomb> bombs = new ArrayList<>();
-    private boolean exploded;
     private boolean passedInto;
-    private int seconds;
-    private final int explosionTime;
 
-    public static Bomb getInstance(int worldX, int worldY) {
+    public static Bomb getInstance(int worldX, int worldY, Observer observer) {
 
         for(Bomb b: bombs) {
             if(b.getWorldPositionX() == worldX && b.getWorldPositionY() == worldY) {
@@ -23,7 +23,7 @@ public class Bomb extends NotMovingAnimatedEntity {
             }
         }
 
-        Bomb b = new Bomb(worldX, worldY);
+        Bomb b = new Bomb(worldX, worldY, observer);
         bombs.add(b);
         return b;
 
@@ -33,33 +33,13 @@ public class Bomb extends NotMovingAnimatedEntity {
         super(worldX, worldY, GamePanel.tileSize, GamePanel.tileSize, 0, 0, "res/Bomb", 15, observer);
 
         passedInto = false;
-        explosionTime = 240;
-        //bombExplosionAnimation = new Animation("/Bomb/Bomb_Explosion/bomb_explosion_0", 5, 0);
+
+        animation = new CycledReversedAnimation(animation, this, 6);
 
     }
 
-    public void explode() {
-        exploded = true;
-    }
-
-    public boolean isExploded() {
-        return exploded;
-    }
-
-    private void resetSecondCounter() {
-        seconds = 0;
-    }
-
-    public int getSeconds() {
-        return seconds;
-    }
-
-    public int getExplosionTime() {
-        return explosionTime;
-    }
-
-    public void increaseSeconds() {
-        seconds++;
+    public static void removeBomb(Bomb bomb) {
+        bombs.remove(bomb);
     }
 
     public boolean isPassedInto() {
@@ -70,11 +50,17 @@ public class Bomb extends NotMovingAnimatedEntity {
         passedInto = true;
     }
 
-    public void draw(Graphics2D g2, Player player) {
-        int screenX = worldPositionX;
-        int screenY = worldPositionY;
+    public void draw(Graphics2D g2) {
 
-        g2.drawImage(animation.getCurrentImage(), screenX, screenY, 48, 48, null);
+        g2.drawImage(animation.getCurrentImage(), worldPositionX, worldPositionY, GamePanel.tileSize, GamePanel.tileSize, null);
+
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+
+        setChanged();
+        notifyObservers(arg);
 
     }
 }

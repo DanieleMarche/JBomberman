@@ -6,14 +6,15 @@ import tile.TileType;
 import tile.tileGerarchy.Tile;
 
 import java.awt.*;
+import java.util.Observer;
 
-public abstract class AnimatedTile extends Tile {
+public abstract class AnimatedTile extends Tile implements Observer {
 
     protected Animation animation;
 
-    public AnimatedTile(TileType tileType, int row, int col, boolean solid, boolean explodable, boolean getFire, String animationPath, int spritesNumber) {
+    public AnimatedTile(TileType tileType, int row, int col, boolean solid, boolean explodable, boolean getFire, String animationPath) {
         super(tileType, row, col, solid, explodable, getFire);
-        this.animation = new Animation(animationPath, spritesNumber, 0);
+        this.animation = new Animation(animationPath, 10, this);
     }
 
     public Animation getAnimation() {

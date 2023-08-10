@@ -5,10 +5,11 @@ import entityGerarchy.MovingEntity;
 import main.GamePanel;
 
 import java.awt.*;
+import java.util.Observer;
 
-public abstract class EntityController {
+public abstract class EntityController implements Observer {
     protected GamePanel gamePanel;
-    public CollisionChecker collisionChecker;
+    protected CollisionChecker collisionChecker;
 
     public EntityController(GamePanel gamePanel){
 

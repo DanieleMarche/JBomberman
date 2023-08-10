@@ -4,14 +4,16 @@ import entityGerarchy.Direction;
 import entityGerarchy.MovingEntity;
 import main.GamePanel;
 import java.awt.*;
+import java.util.Observable;
+import java.util.Observer;
 
 public class Player extends MovingEntity {
 
     static Player istance = null;
 
-    public static Player getInstance(int positionX, int positionY, int speed) {
+    public static Player getInstance(int positionX, int positionY, int speed, GamePanel observer) {
         if(istance == null) {
-            istance = new Player(positionX, positionY, speed, "bomberMan", "bomberman");
+            istance = new Player(positionX, positionY, speed);
             return istance;
         }else {
             return istance;
@@ -96,12 +98,13 @@ public class Player extends MovingEntity {
     }
 
     public void draw(Graphics2D g2) {
-
-        int x = worldPositionX;
-        int y = worldPositionY;
-
-        g2.drawImage(currentAnimation.getCurrentImage(), x, y, spritesWidth * GamePanel.tileScale, spritesHeight * GamePanel.tileScale, null);
+        g2.drawImage(currentAnimation.getCurrentImage(), worldPositionX, worldPositionY, spritesWidth * GamePanel.tileScale, spritesHeight * GamePanel.tileScale, null);
     }
 
 
+    @Override
+    public void update(Observable o, Object arg) {
+        setChanged();
+        notifyObservers(arg);
+    }
 }

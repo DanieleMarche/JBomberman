@@ -1,10 +1,15 @@
 package Controllers;
 
+import Controllers.ControllersGerarchy.EntityController;
 import entityGerarchy.Direction;
+import main.GamePanel;
 import player.Player;
 import Animation.*;
 
-public class PlayerController {
+import java.util.Observable;
+import java.util.Observer;
+
+public class PlayerController extends EntityController {
     private final Player player;
     private final KeyHandler keyHandler;
     private final BombController bombController;
@@ -14,7 +19,8 @@ public class PlayerController {
     private int spriteCounter;
     private int previousSpriteNum;
 
-    public PlayerController(Player player, KeyHandler keyHandler, BombController bombController, CollisionDetector collisionDetector) {
+    public PlayerController(Player player, KeyHandler keyHandler, BombController bombController, CollisionDetector collisionDetector, GamePanel gamePanel) {
+        super(gamePanel);
         this.player = player;
         currentAnimation = player.getCurrentAnimation();
         this.keyHandler = keyHandler;
@@ -53,7 +59,7 @@ public class PlayerController {
             }
 
             if(!keyHandler.isAMovementKeyPressed() && currentAnimation.getCurrentSprite() != 1) {
-                if(spriteCounter % 10 != 0) currentAnimation.setDefaultSprite();
+                if(spriteCounter % player.getCurrentAnimation().getAnimationSpeed() != 0) currentAnimation.setDefaultSprite();
                 spriteCounter = 0;
             }
 
@@ -71,7 +77,7 @@ public class PlayerController {
             }
 
 
-            if (spriteCounter % 10 == 0) {
+            if (spriteCounter % player.getCurrentAnimation().getAnimationSpeed() == 0) {
                 switch (currentAnimation.getCurrentSprite()) {
                     case 2 -> {
                         currentAnimation.setPreviousSprite();
@@ -91,7 +97,7 @@ public class PlayerController {
 
 
             player.incresePixelCounter();
-            if(player.getPixelCounter() == 48) {
+            if(player.getPixelCounter() == GamePanel.tileSize) {
                 player.stopMoving();
                 player.resetPixelCounter();
             }
@@ -105,7 +111,11 @@ public class PlayerController {
 
     }
 
-
-
+    @Override
+    public void update(Observable o, Object arg) {
+        switch((AnimationMessages) arg) {
+            case REPAINT -> gamePanel.repaint();
+        }
+    }
 }
 

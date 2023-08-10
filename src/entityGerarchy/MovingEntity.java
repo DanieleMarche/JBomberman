@@ -6,8 +6,9 @@ import main.GamePanel;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Observer;
 
-public abstract class MovingEntity extends Entity{
+public abstract class MovingEntity extends Entity implements Observer{
     protected int speed;
 
     protected Animation currentAnimation;
@@ -25,15 +26,14 @@ public abstract class MovingEntity extends Entity{
 
     protected Direction direction;
 
-    public MovingEntity(int worldPositionX, int worldPositionY, int speed,int width, int height, int solidAreaDefaultX, int solidAreaDefaultY, String directoryName, String filesName, int numSprites, int defaultSprite) {
+    public MovingEntity(int worldPositionX, int worldPositionY, int speed,int width, int height, int solidAreaDefaultX, int solidAreaDefaultY, String directoryName, int defautlSpriteNum, int animationSpeed) {
         super(worldPositionX, worldPositionY, width, height, solidAreaDefaultX, solidAreaDefaultY);
         this.speed = speed;
-        ArrayList<BufferedImage> a = new ArrayList<>();
 
-        frontAnimation = new Animation("/" + directoryName + "/front/" + filesName + "_front_0", 3, 1);
-        backAnimation = new Animation("/" + directoryName + "/back/" + filesName + "_back_0", 3, 1);
-        rightSideAnimation = new Animation("/" + directoryName + "/right/" + filesName+ "_right_0", 3, 1);
-        leftSideAnimation = new Animation("/" + directoryName + "/left/" + filesName+ "_left_0", 3, 1);
+        frontAnimation = new Animation(directoryName + "/front", defautlSpriteNum, animationSpeed, this);
+        backAnimation = new Animation(directoryName + "/back", defautlSpriteNum, animationSpeed, this);
+        rightSideAnimation = new Animation(directoryName + "/right", defautlSpriteNum, animationSpeed, this);
+        leftSideAnimation = new Animation(directoryName + "/left", defautlSpriteNum, animationSpeed, this);
 
         currentAnimation = frontAnimation;
 
@@ -45,6 +45,14 @@ public abstract class MovingEntity extends Entity{
     public void setDirection(Direction direction) {
         this.direction = direction;
         updateCurrentAnimation();
+    }
+
+    public int getSpritesWidth() {
+        return spritesWidth;
+    }
+
+    public int getSpritesHeight() {
+        return spritesHeight;
     }
 
     public Direction getDirection() {
@@ -71,25 +79,25 @@ public abstract class MovingEntity extends Entity{
     public void moveUp() {
         worldPositionY -= speed;
         setChanged();
-        notifyObservers();
+        notifyObservers(AnimationMessages.REPAINT);
     }
 
     public void moveDown() {
         worldPositionY += speed;
         setChanged();
-        notifyObservers();
+        notifyObservers(AnimationMessages.REPAINT);
     }
 
     public void moveLeft() {
         worldPositionX -= speed;
         setChanged();
-        notifyObservers();
+        notifyObservers(AnimationMessages.REPAINT);
     }
 
     public void moveRight() {
         worldPositionX += speed;
         setChanged();
-        notifyObservers();
+        notifyObservers(AnimationMessages.REPAINT);
     }
 
     public void updateCurrentAnimation() {
@@ -99,6 +107,8 @@ public abstract class MovingEntity extends Entity{
             case LEFT -> currentAnimation = leftSideAnimation;
             case RIGHT ->  currentAnimation = rightSideAnimation;
         }
+        setChanged();
+        notifyObservers(AnimationMessages.REPAINT);
     }
 
     public Animation getCurrentAnimation() {
@@ -122,11 +132,11 @@ public abstract class MovingEntity extends Entity{
     }
 
     public int getRow() {
-        return (worldPositionY + solidArea.y) / GamePanel.tileSize;
+        return (getBounds().y) / GamePanel.tileSize;
     }
 
     public int getCol(){
-        return (worldPositionX + solidArea.x) / GamePanel.tileSize;
+        return (getBounds().x) / GamePanel.tileSize;
     }
 
     public Animation getDeathAnimation() {

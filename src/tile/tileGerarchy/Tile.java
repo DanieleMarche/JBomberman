@@ -4,7 +4,9 @@ import Animation.Drawable;
 import main.GamePanel;
 import tile.TileType;
 
-public abstract class Tile implements Drawable {
+import java.util.Observable;
+
+public abstract class Tile extends Observable implements Drawable {
 
     protected TileType tileType;
     protected boolean solid;

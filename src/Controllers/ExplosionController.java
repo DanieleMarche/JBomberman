@@ -1,54 +1,69 @@
 package Controllers;
 
+import Animation.*;
 import Controllers.ControllersGerarchy.AnimatedEntityController;
 import Explosion.Explosion;
-import Explosion.Flame;
+import Flames.Flame;
 import entityGerarchy.MovingEntity;
 import main.GamePanel;
 import player.Player;
-import tile.TileManager;
+import tile.Map;
 
 import java.util.*;
 
+import static Explosion.Explosion.explosions;
+
 public class ExplosionController extends AnimatedEntityController {
     private final Player player;
-    private final TileManager tileManager;
+    private final Map map;
 
-    public ExplosionController(GamePanel gamePanel, Player player, TileManager tileManager) {
+    private int secondCounter;
+
+    public ExplosionController(GamePanel gamePanel, Player player, Map map) {
         super(gamePanel);
         this.player = player;
-        this.tileManager = tileManager;
+        this.map = map;
+        secondCounter = 0;
 
-        collisionChecker = (MovingEntity me) -> {for(Explosion e: gamePanel.getExplosions()) {
-            for(ArrayList<Flame> flames: e.getFlameRadius()) {
-                for(Flame f: flames) {
-                    if(checkCollisionMovingAndNotMoving(me, f)) {
-                        System.out.println("Collisione tra fiamme e bomberman");
+        collisionChecker = (MovingEntity me) -> {
+            for (Explosion e : explosions) {
+                for (Flame flame : e.getFlameRadius()) {
+                    if (checkCollisionMovingAndNotMoving(me, flame)) {
+
                     }
                 }
-
             }
-        }
-    };
+        };
     }
 
+    public void activateExplosion (int col, int row) {
+        explosions.add(new Explosion(col, row, player.getExplosionRadius(), map, this));
+    }
 
+    @Override
     public void updateAnimation() {
+        secondCounter++;
+        ArrayList<Explosion> explosionsCopy = new ArrayList<>(explosions);
+        explosionsCopy.forEach(explosion -> {
+            explosion.getFlameRadius().forEach(flame -> {
+                Animation a = flame.getAnimation();
+                if(secondCounter % a.getAnimationSpeed() == 0) {
+                    a.setNextSprite();
+                }
+            });
+        });
 
-        Iterator<Explosion> i = gamePanel.getExplosions().iterator();
-
-        while(i.hasNext()) {
-            Explosion e = i.next();
-
-            if(e.update()) {
-                e.removeDestructibleBlocks(tileManager);
-                i.remove();
-
-            }
-        }
     }
 
-    public void activateExplosion (int worldX, int worldY) {
-        gamePanel.addExplosion(new Explosion(worldX, worldY, player.getExplosionRadius(), tileManager, gamePanel));
+
+    @Override
+    public void update(Observable o, Object arg) {
+        Explosion explosion = (Explosion) o;
+        switch ((AnimationMessages)arg) {
+            case REPAINT -> explosion.getFlameRadius().forEach(flame -> {
+                gamePanel.repaint(flame.getWorldPositionX(), flame.getWorldPositionY(), GamePanel.tileSize, GamePanel.tileSize);
+            });
+            case REMOVE -> explosion.removeExplosion(explosion);
+        }
     }
 }

@@ -1,13 +1,14 @@
 package Controllers;
 
-import Animation.Animation;
+import Animation.AnimationMessages;
+import Animation.CycledReversedAnimation;
 import Bomb.Bomb;
 import Controllers.ControllersGerarchy.AnimatedEntityController;
 import main.GamePanel;
 import player.Player;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Observable;
 
 public class BombController extends AnimatedEntityController {
     private final Player player;
@@ -23,9 +24,15 @@ public class BombController extends AnimatedEntityController {
         collisionChecker = movingEntity -> {
             for(Bomb bomb: Bomb.bombs) {
 
-                if(checkCollisionMovingAndNotMoving(movingEntity, bomb) && bomb.isPassedInto()) movingEntity.activateCollision();
+                if(checkCollisionMovingAndNotMoving(movingEntity, bomb) && bomb.isPassedInto()) {
+                    movingEntity.activateCollision();
 
-                if(!checkCollisionMovingAndNotMoving(movingEntity, bomb) && !bomb.isPassedInto()) bomb.hasPassedInto();
+                }
+
+                if(!checkCollisionMovingAndNotMoving(movingEntity, bomb) && !bomb.isPassedInto()) {
+                    bomb.hasPassedInto();
+
+                }
 
             }
 
@@ -35,24 +42,16 @@ public class BombController extends AnimatedEntityController {
     @Override
     public void updateAnimation() {
 
-        for (Bomb b : Bomb.bombs) {
-            Animation a = b.getAnimation();
+        spriteCounter++;
 
-            spriteCounter++;
-            if (spriteCounter % 20 == 0) {
+        ArrayList<Bomb> bombCopy = new ArrayList<>(Bomb.bombs);
 
+        bombCopy.forEach(bomb -> {
+            CycledReversedAnimation a = (CycledReversedAnimation) bomb.getAnimation();
+            if(spriteCounter % a.getAnimationSpeed() == 0) {
                 a.setNextSprite();
-
-                spriteCounter = 0;
             }
-
-            b.increaseSeconds();
-            if (b.getSeconds() == b.getExplosionTime()) {
-                if (!b.isExploded()) explode(b);
-            }
-        }
-
-        Bomb.bombs.removeIf(b -> b.isExploded());
+        });
 
     }
 
@@ -60,17 +59,27 @@ public class BombController extends AnimatedEntityController {
         if(player.getRemainingBombsAtSameTime() > 0) {
             player.decreaseRemainingBombsAtSameTime();
 
-            Bomb b = Bomb.getInstance((((player.getWorldPositionX() + 10) / GamePanel.tileSize) * GamePanel.tileSize), (((player.getWorldPositionY() + 48) / GamePanel.tileSize) * GamePanel.tileSize));
-            b.addObserver(gamePanel);
+            Bomb b = Bomb.getInstance((player.getCol() * GamePanel.tileSize), (player.getRow() * GamePanel.tileSize) + 2, this);
 
             gamePanel.addBomb(b);
         }
     }
 
     public void explode  (Bomb bomb)  {
-        bomb.explode();
         player.increaseRemainingBombsAtSameTime();
-        explosionController.activateExplosion(bomb.getWorldPositionX(), bomb.getWorldPositionY());
+        explosionController.activateExplosion(bomb.getCol(), bomb.getRow());
+        Bomb.removeBomb(bomb);
     }
 
+    @Override
+    public void update(Observable o, Object arg) {
+
+        Bomb bomb = (Bomb) o;
+
+        switch((AnimationMessages) arg) {
+            case REPAINT -> gamePanel.repaint(bomb.getWorldPositionX(), bomb.getWorldPositionY(), GamePanel.tileSize, GamePanel.tileSize);
+            case REMOVE -> explode(bomb);
+        }
+
+    }
 }

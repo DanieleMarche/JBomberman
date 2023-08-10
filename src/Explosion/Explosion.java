@@ -1,99 +1,98 @@
 package Explosion;
 
+import Animation.AnimationMessages;
+import Flames.Flame;
+import Flames.FlameType;
+import entityGerarchy.Entity;
+import main.GamePanel;
 import tile.DestructibleBlock;
-import tile.Tile;
-import tile.TileManager;
+import tile.Map;
 import player.Player;
-import Animation.*;
+import tile.tileGerarchy.Tile;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
-public class Explosion extends Observable {
+public class Explosion extends Observable implements Observer {
+    public static ArrayList<Explosion> explosions = new ArrayList<>();
+    private final ArrayList<Flame> flames;
 
-    private final ArrayList<Flame>[] flameRadius;
-    private static final int explosionTime = 120;
-    private int secondsCount;
+    public Explosion(int bombCol, int bombRow, int explosionRadius, Map map, Observer observer) {
+        addObserver(observer);
 
-    public Explosion(int worldX, int worldY, int explosionRadius, TileManager tileManager, Observer gamePanel) {
-        addObserver(gamePanel);
-        int bombCol = (worldX + 24)/ 48;
-        int bombRow = (worldY / 48);
+        ArrayList<Flame> flameRadiusUp = createFlameList(bombRow, bombCol, 1, 0, explosionRadius, map, FlameType.VERTICAL_FLAME, this);
+        ArrayList<Flame> flameRadiusDown = createFlameList(bombRow, bombCol, -1, 0, explosionRadius, map, FlameType.VERTICAL_FLAME, this);
+        ArrayList<Flame> flameRadiusRight = createFlameList(bombRow, bombCol, 0, 1, explosionRadius, map, FlameType.HORIZONTHAL_FLAME, this);
+        ArrayList<Flame> flameRadiusLeft = createFlameList(bombRow, bombCol, 0, -1, explosionRadius, map, FlameType.HORIZONTHAL_FLAME, this);
 
-        ArrayList<Flame> flameRadiusUp = createFlameList(bombRow, bombCol, 1, 0, explosionRadius, tileManager,  gamePanel);
-        ArrayList<Flame> flameRadiusDown = createFlameList(bombRow, bombCol, -1, 0, explosionRadius, tileManager,  gamePanel);
-        ArrayList<Flame> flameRadiusRight = createFlameList(bombRow, bombCol, 0, 1, explosionRadius, tileManager,  gamePanel);
-        ArrayList<Flame> flameRadiusLeft = createFlameList(bombRow, bombCol, 0, -1, explosionRadius, tileManager,  gamePanel);
-
-
-        flameRadius = new ArrayList[] {flameRadiusUp, flameRadiusDown, flameRadiusLeft, flameRadiusRight};
-
-        secondsCount = 0;
+        flames = new ArrayList<>();
+        flames.add(new Flame(bombCol * GamePanel.tileSize, bombRow * GamePanel.tileSize, FlameType.BOMB_FLAME, this));
+        flames.addAll(flameRadiusDown);
+        flames.addAll(flameRadiusUp);
+        flames.addAll(flameRadiusLeft);
+        flames.addAll(flameRadiusRight);
     }
-    private ArrayList<Flame> createFlameList(int row, int col, int rowIncrement, int colIncrement, int explosionRadius, TileManager tileManager, Observer gamePanel) {
+
+    private ArrayList<Flame> createFlameList(int row, int col, int rowIncrement, int colIncrement, int explosionRadius, Map map, FlameType flameType, Observer obsesrver) {
         ArrayList<Flame> flameList = new ArrayList<>();
         Tile tile;
-
 
         for (int i = 1; i <= explosionRadius; i++) {
 
             row += rowIncrement;
             col += colIncrement;
-            tile = tileManager.getTile(tileManager.getMapTileNum(row, col));
 
-            if (!tile.doesGetOnFire()){
+            tile = map.getTile(row, col);
+
+
+            if (!tile.doesGetFire()){
                 break;
             }
 
-            //flameList.add(new Flame(col * 48, row * 48, gamePanel));
-
-            if(tile.isDestructible()) {
-                DestructibleBlock db = DestructibleBlock.getIstance(col, row, 0);
+            if(tile.isExplodable() && tile instanceof DestructibleBlock db) {
                 db.explode();
                 break;
             }
+
+            if(i == explosionRadius) {
+                switch(flameType) {
+                    case VERTICAL_FLAME -> {
+                        if(rowIncrement > 0) flameType = FlameType.LOWER_FLAME_TIP;
+                        else flameType = FlameType.UPPER_FLAME_TIP;
+                    }
+                    case HORIZONTHAL_FLAME -> {
+                        if(colIncrement > 0) flameType = FlameType.RIGHT_FLAME_TIP;
+                        else flameType = FlameType.LEFT_FLAME_TIP;
+                    }
+                }
+            }
+
+            flameList.add(new Flame(col * GamePanel.tileSize, row * GamePanel.tileSize, flameType, obsesrver));
 
         }
 
         return flameList;
     }
 
-    public ArrayList<Flame>[] getFlameRadius() {
-        return flameRadius;
+    public ArrayList<Flame> getFlameRadius() {
+        return flames;
     }
 
-    public boolean update() {
-        secondsCount++;
-        if(secondsCount % 7 == 0) {
-            for(ArrayList<Flame> flames: flameRadius) {
-                flames.forEach(Flame::updateAnimation);
-            }
-        }
-        return secondsCount == explosionTime;
+    public void removeExplosion(Explosion explosion) {
+        explosions.removeIf(explosion1 -> explosion1.equals(explosion));
     }
-    public void removeDestructibleBlocks(TileManager tileManager) {
 
-
-        for(ArrayList<Flame> flames: flameRadius) {
-            flames.stream()
-                    .filter(flame ->
-                            tileManager.getTile(
-                                    tileManager.getMapTileNum(
-                                            flame.getWorldPositionY()/64, flame.getWorldPositionX()/64))
-                                    .isDestructible())
-                    .forEach(flame -> tileManager.setTile(flame.getWorldPositionY()/64, flame.getWorldPositionX()/64, 0));
+    public void draw(Graphics2D g2) {
+        for(Flame flames: flames) {
+            flames.draw(g2);
         }
+    }
 
-
+    @Override
+    public void update(Observable o, Object arg) {
         setChanged();
-        notifyObservers();
-    }
-
-    public void draw(Graphics2D g2, Player player, TileManager tileManager) {
-        for(ArrayList<Flame> flames: flameRadius) {
-            flames.forEach(f -> f.draw(g2, player));
-        }
+        notifyObservers(arg);
     }
 }

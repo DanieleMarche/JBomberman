@@ -1,5 +1,7 @@
 package tile;
 
+import Controllers.DestructibleBlocksController;
+import Controllers.MapController;
 import main.GamePanel;
 import tile.tileGerarchy.Tile;
 
@@ -11,23 +13,25 @@ import java.util.*;
 
 import static javax.imageio.ImageIO.read;
 
-public class Map extends Observable implements Observer{
+public class Map extends Observable{
 
     public static Map instance;
 
     private TileType[][] mapTileNum;
 
     private Tile[][] map;
+    private DestructibleBlocksController destructibleBlocksController;
 
-    public static Map getInstance(GamePanel gamePanel, String mapName) {
+    public static Map getInstance(GamePanel gamePanel, String mapName, DestructibleBlocksController destructibleBlocksController) {
         if(instance == null) {
-            instance = new Map(gamePanel, mapName);
+            instance = new Map(gamePanel, mapName, destructibleBlocksController);
         }
         return instance;
     }
 
-    private Map(GamePanel gamePanel, String mapName) {
-        addObserver(gamePanel);
+    private Map(GamePanel gamePanel, String mapName, DestructibleBlocksController destructibleBlocksController) {
+        addObserver(new MapController(gamePanel, this));
+        this.destructibleBlocksController = destructibleBlocksController;
 
         loadNumMap(mapName);
 
@@ -93,19 +97,20 @@ public class Map extends Observable implements Observer{
 
                 switch (mapTileNum[row][col]) {
                     case WALKABLE_BLOCK -> {
-                        if(map[row - 1] [col] instanceof DestructibleBlock ) map[row][col] = new WalkableBlock(row, col, false);
-                        else if(getMapTileNum(row - 1, col) == TileType.LIMIT_BLOCK || getMapTileNum(row - 1, col) == TileType.SOLID_BLOCK) map[row][col] = new WalkableBlock(row, col, true);
-                        else map[row][col] = new WalkableBlock(row, col);
+                        map[row][col] = getWalkableBlock(row, col);
                     }
                     case LIMIT_BLOCK -> map[row][col] = new LimitBlock(row, col);
 
                     case DESTRUCTIBLE_BLOCK -> {
-                        if(getMapTileNum(row - 1, col) == TileType.SOLID_BLOCK || getMapTileNum(row - 1, col) == TileType.LIMIT_BLOCK) map[row][col] = new DestructibleBlock(row, col, true);
-                        else map[row][col] = new DestructibleBlock(row, col, false);
+                        if(getMapTileNum(row - 1, col) == TileType.SOLID_BLOCK || getMapTileNum(row - 1, col) == TileType.LIMIT_BLOCK) map[row][col] = new DestructibleBlock(row, col, true, destructibleBlocksController );
+                        else map[row][col] = new DestructibleBlock(row, col, false, destructibleBlocksController);
                     }
 
                     case SOLID_BLOCK -> map[row][col] = new SolidBlock(row, col);
                 }
+
+                setChanged();
+                notifyObservers(map[row][col]);
             }
         }
 
@@ -117,6 +122,30 @@ public class Map extends Observable implements Observer{
         notifyObservers();
     }
 
+    public void removeDestructibleBlock(DestructibleBlock destructibleBlock) {
+        int row = destructibleBlock.getRow();
+        int col = destructibleBlock.getCol();
+
+        map[row][col] = getWalkableBlock(row, col);
+        DestructibleBlock.destructibleBlocks.remove(destructibleBlock);
+    }
+
+
+    /**
+     * This function looks at the map matrix to decide what WalkableBlock to instantiate.
+     * @param row
+     * @param col
+     * @return WalkableBlock
+     */
+    private WalkableBlock getWalkableBlock(int row, int col) {
+        WalkableBlock walkableBlock;
+        if(map[row - 1] [col] instanceof DestructibleBlock ) walkableBlock = new WalkableBlock(row, col, false);
+        else if(getMapTileNum(row - 1, col) == TileType.LIMIT_BLOCK || getMapTileNum(row - 1, col) == TileType.SOLID_BLOCK) walkableBlock = new WalkableBlock(row, col, true);
+        else walkableBlock = new WalkableBlock(row, col);
+        return walkableBlock;
+    }
+
+
     public void draw(Graphics2D g2) {
         Arrays.stream(map).toList().stream()
                 .forEach(tiles -> Arrays.stream(tiles)
@@ -125,12 +154,6 @@ public class Map extends Observable implements Observer{
 
     public Tile getTile(int worldRow, int worldCol) {
         return map[worldRow][worldCol];
-    };
-
-    @Override
-    public void update(Observable o, Object arg) {
-        setChanged();
-        notifyObservers();
     }
 }
 

@@ -1,30 +1,38 @@
 package tile;
 
+import Animation.CycledAnimation;
 import tile.tileGerarchy.AnimatedTile;
 
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
+
 
 public class DestructibleBlock extends AnimatedTile {
 
     public static ArrayList<DestructibleBlock> destructibleBlocks = new ArrayList<>();
 
     private boolean exploded;
-
-    public DestructibleBlock(int row, int col, boolean imageType) {
-        super(TileType.WALKABLE_BLOCK, row, col, true, true, true, findPath(imageType), 4);
+    public DestructibleBlock(int row, int col, boolean imageType, Observer observer) {
+        super(TileType.WALKABLE_BLOCK, row, col, true, true, true, findPath(imageType));
 
         exploded = false;
 
         destructibleBlocks.add(this);
+        addObserver(observer);
 
     }
 
     public static String findPath(boolean type) {
 
-        if(type) return "/Blocks/destructable_block/with_shadow" + "/" + "destructible_block_shadow" + "_0";
+        if(type) return "res/Blocks/destructable_block/with_shadow";
 
-        return "/Blocks/destructable_block" + "/" + "destructable_block" + "_0";
+        return "res/Blocks/destructable_block";
 
+    }
+
+    public static void removeDestructibleBlock(DestructibleBlock destructibleBlock) {
+        destructibleBlocks.remove(destructibleBlock);
     }
 
     public boolean isExploded() {
@@ -33,6 +41,12 @@ public class DestructibleBlock extends AnimatedTile {
 
     public void explode() {
         exploded = true;
+        animation = new CycledAnimation("res/Explosion/Destructible_block_explosion", 10, this, 1);
     }
 
+    @Override
+    public void update(Observable o, Object arg) {
+        setChanged();
+        notifyObservers(arg);
+    }
 }

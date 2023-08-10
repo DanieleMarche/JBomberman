@@ -14,7 +14,9 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
-public class GamePanel extends JPanel implements Runnable, Observer {
+import static Explosion.Explosion.explosions;
+
+public class GamePanel extends JPanel implements Runnable {
     //how many times to scale the tiles
     public static final int originalTileSize = 16;
     public static final int tileScale = 3;
@@ -40,7 +42,6 @@ public class GamePanel extends JPanel implements Runnable, Observer {
 
     private final ArrayList<PowerUp> powerUps;
     private final ArrayList<Bomb> bombs;
-    private final ArrayList<Explosion> explosions;
 
     //World settings
     public final static int maxWorldCol = 15;
@@ -65,7 +66,6 @@ public class GamePanel extends JPanel implements Runnable, Observer {
 
         powerUps = new ArrayList<>();
         bombs = Bomb.bombs;
-        explosions = new ArrayList<>();
 
         assetSetter.setObject();
 
@@ -75,37 +75,35 @@ public class GamePanel extends JPanel implements Runnable, Observer {
         gameStateController = new GameStateController(keyH, this);
 
 
-        player = Player.getInstance(96, 24, 3);
-        player.addObserver(this);
+        player = Player.getInstance(96, 24, 3, this);
 
-        map = Map.getInstance(this, "/maps/level_1.txt");
+        destructibleBlocksController = new DestructibleBlocksController(this);
 
-        destructibleBlocksController = new DestructibleBlocksController(this, tileManager);
+        map = Map.getInstance(this, "/maps/level_1.txt", destructibleBlocksController);
+        destructibleBlocksController.setMap(map);
 
-        CollisionDetector collisionDetector = new CollisionDetector(tileManager);
 
-        explosionController = new ExplosionController(this, player, tileManager);
+
+
+        explosionController = new ExplosionController(this, player, map);
         bombController = new BombController(this, player, explosionController);
 
-        playerController = new PlayerController(player, keyH, new PowerUpsController(this), bombController, collisionDetector, null);
+        CollisionDetector collisionDetector = new CollisionDetector(map, bombController);
+
+
+        playerController = new PlayerController(player, keyH, bombController, collisionDetector, this);
+        player.addObserver(playerController);
 
         setDoubleBuffered(true);
         setFocusable(true);
 
     }
 
-    public ArrayList<Bomb> getBombs() {return bombs;}
     public ArrayList<PowerUp> getPowerUps() {
         return powerUps;
     }
-    public ArrayList<Explosion> getExplosions() {
-        return explosions;
-    }
 
     public void addBomb (Bomb b) {bombs.add(b);}
-    public void addExplosion(Explosion explosion) {
-        explosions.add(explosion);
-    }
     public void addPowerUp(PowerUp powerUp) {
         this.powerUps.add(powerUp);
     }
@@ -172,13 +170,12 @@ public class GamePanel extends JPanel implements Runnable, Observer {
 
             bombController.updateAnimation();
 
-            //explosionController.updateAnimation();
+            explosionController.updateAnimation();
 
         }
         if(gameState == pauseState) {
             //nothing
         }
-
 
     }
 
@@ -191,18 +188,14 @@ public class GamePanel extends JPanel implements Runnable, Observer {
 
         //powerUps.forEach(pUps -> pUps.draw(g2, player));
 
-        bombs.forEach(b -> b.draw(g2, player));
+        bombs.forEach(b -> b.draw(g2));
 
-        //explosions.forEach(e -> e.draw(g2, player, tileManager));
+        DestructibleBlock.destructibleBlocks.forEach(db -> db.draw(g2));
+
+        explosions.forEach(e -> e.draw(g2));
 
         player.draw(g2);
 
         g2.dispose();
-    }
-
-    @Override
-    public void update(Observable o, Object arg) {
-
-        repaint();
     }
 }

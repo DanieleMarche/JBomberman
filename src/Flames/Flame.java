@@ -1,11 +1,15 @@
-package Explosion;
 
+package Flames;
+
+import Animation.AnimationMessages;
+import Animation.CycledAnimation;
+import Animation.CycledReversedAnimation;
 import entityGerarchy.NotMovingAnimatedEntity;
-import player.Player;
+import main.GamePanel;
 
 import java.awt.*;
+import java.util.Observable;
 import java.util.Observer;
-import java.util.Random;
 
 public class Flame extends NotMovingAnimatedEntity {
 
@@ -19,18 +23,15 @@ public class Flame extends NotMovingAnimatedEntity {
 
     }
 
-    public void updateAnimation() {
-         //currentSpriteNum = r.nextInt(0, numSprites);
-         setChanged();
-         notifyObservers();
+    public void draw(Graphics2D g2) {
+
+        g2.drawImage(animation.getCurrentImage(), worldPositionX, worldPositionY, GamePanel.tileSize, GamePanel.tileSize, null);
+
     }
 
-    public void draw(Graphics2D g2, Player player) {
-
-        int screenX = worldPositionX;
-        int screenY = worldPositionY;
-
-        //g2.drawImage(images.get(currentSpriteNum), screenX, screenY, 48, 48, null);
-
+    @Override
+    public void update(Observable o, Object arg) {
+        setChanged();
+        notifyObservers(arg);
     }
 }
