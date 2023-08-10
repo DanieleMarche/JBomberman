@@ -24,8 +24,8 @@ public class Player extends MovingEntity {
     private boolean moving;
     private int pixelCounter;
 
-    private Player(int positionX, int positionY, int speed, String directoryName, String fileNames) {
-        super(positionX, positionY, speed, GamePanel.tileSize, GamePanel.tileSize, 0, 26, directoryName, fileNames, 3, 1);
+    private Player(int positionX, int positionY, int speed) {
+        super(positionX, positionY, speed, GamePanel.tileSize, GamePanel.tileSize, 0, 26, "res/bomberMan", 1, 10);
 
         bombAtSameTime = remainingBombsAtSameTime = 1;
         explosionRadius = 1;

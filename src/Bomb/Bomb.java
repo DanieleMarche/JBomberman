@@ -29,10 +29,8 @@ public class Bomb extends NotMovingAnimatedEntity {
 
     }
 
-    private Bomb(int worldX, int worldY) {
-        super(worldX, worldY, 48, 48, 0, 0, "/Bomb/Bomb_0", 3);
-
-        exploded = false;
+    private Bomb(int worldX, int worldY, Observer observer) {
+        super(worldX, worldY, GamePanel.tileSize, GamePanel.tileSize, 0, 0, "res/Bomb", 15, observer);
 
         passedInto = false;
         explosionTime = 240;

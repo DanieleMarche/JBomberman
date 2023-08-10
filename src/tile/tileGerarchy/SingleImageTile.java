@@ -1,9 +1,8 @@
 package tile.tileGerarchy;
 
-import Animation.ImageUtils;
+import Utils.ImageUtils;
 import main.GamePanel;
 import tile.TileType;
-import tile.tileGerarchy.Tile;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

@@ -4,8 +4,8 @@ import tile.tileGerarchy.SingleImageTile;
 
 import java.awt.image.BufferedImage;
 import java.util.Objects;
-import static Animation.ImageUtils.loadImage;
-import static Animation.ImageUtils.mirrorImage;
+import static Utils.ImageUtils.loadImage;
+import static Utils.ImageUtils.mirrorImage;
 
 public class LimitBlock extends SingleImageTile {
 
@@ -14,7 +14,7 @@ public class LimitBlock extends SingleImageTile {
     }
 
     private static BufferedImage findImage(int worldRow, int worldCol) {
-        String directoryPath = "/Blocks/limit/";
+        String directoryPath = "res/Blocks/limit/";
 
         BufferedImage image = null;
 

@@ -2,7 +2,7 @@ package entityGerarchy;
 
 import main.GamePanel;
 import java.awt.image.BufferedImage;
-import static Animation.ImageUtils.loadImage;
+import static Utils.ImageUtils.loadImage;
 
 public abstract class NotMovingEntity extends Entity{
 
