@@ -139,9 +139,9 @@ public class Map extends Observable{
      */
     private WalkableBlock getWalkableBlock(int row, int col) {
         WalkableBlock walkableBlock;
-        if(map[row - 1] [col] instanceof DestructibleBlock ) walkableBlock = new WalkableBlock(row, col, false);
-        else if(getMapTileNum(row - 1, col) == TileType.LIMIT_BLOCK || getMapTileNum(row - 1, col) == TileType.SOLID_BLOCK) walkableBlock = new WalkableBlock(row, col, true);
-        else walkableBlock = new WalkableBlock(row, col);
+        if(map[row - 1] [col] instanceof DestructibleBlock ) walkableBlock = new WalkableBlock(row, col, WalkableBlock.WalkableBlockType.UNDER_DESTRUCTIBLE_BLOCK);
+        else if(getMapTileNum(row - 1, col) == TileType.LIMIT_BLOCK || getMapTileNum(row - 1, col) == TileType.SOLID_BLOCK) walkableBlock = new WalkableBlock(row, col, WalkableBlock.WalkableBlockType.UNDER_LIMIT_OR_SOLID_BLOCK);
+        else walkableBlock = new WalkableBlock(row, col, WalkableBlock.WalkableBlockType.UNDER_WALKABLE_BLOCK);
         return walkableBlock;
     }
 

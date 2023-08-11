@@ -26,6 +26,10 @@ public abstract class Tile extends Observable implements Drawable {
         this.getFire = getFire;
     }
 
+    public TileType getTileType() {
+        return tileType;
+    }
+
     public boolean isSolid() {
         return solid;
     }
