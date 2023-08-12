@@ -1,16 +1,12 @@
 package Explosion;
 
-import Animation.AnimationMessages;
 import Flames.Flame;
 import Flames.FlameType;
-import entityGerarchy.Entity;
 import main.GamePanel;
 import tile.DestructibleBlock;
 import tile.Map;
-import player.Player;
 import tile.tileGerarchy.Tile;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -19,23 +15,22 @@ public class Explosion extends Observable implements Observer {
     public static ArrayList<Explosion> explosions = new ArrayList<>();
     private final ArrayList<Flame> flames;
 
-    public Explosion(int bombCol, int bombRow, int explosionRadius, Map map, Observer observer) {
+    public Explosion(int bombCol, int bombRow, int explosionRadius, Map map, Observer observer, Observer flameObserver) {
         addObserver(observer);
 
-        ArrayList<Flame> flameRadiusUp = createFlameList(bombRow, bombCol, 1, 0, explosionRadius, map, FlameType.VERTICAL_FLAME, this);
-        ArrayList<Flame> flameRadiusDown = createFlameList(bombRow, bombCol, -1, 0, explosionRadius, map, FlameType.VERTICAL_FLAME, this);
-        ArrayList<Flame> flameRadiusRight = createFlameList(bombRow, bombCol, 0, 1, explosionRadius, map, FlameType.HORIZONTHAL_FLAME, this);
-        ArrayList<Flame> flameRadiusLeft = createFlameList(bombRow, bombCol, 0, -1, explosionRadius, map, FlameType.HORIZONTHAL_FLAME, this);
-
         flames = new ArrayList<>();
-        flames.add(new Flame(bombCol * GamePanel.tileSize, bombRow * GamePanel.tileSize, FlameType.BOMB_FLAME, this));
-        flames.addAll(flameRadiusDown);
-        flames.addAll(flameRadiusUp);
-        flames.addAll(flameRadiusLeft);
-        flames.addAll(flameRadiusRight);
+        flames.add(new Flame(bombCol * GamePanel.tileSize, bombRow * GamePanel.tileSize, FlameType.BOMB_FLAME, flameObserver));
+
+        flames.addAll(createFlameList(bombRow, bombCol, -1, 0, explosionRadius, map, FlameType.VERTICAL_FLAME, flameObserver));
+
+        flames.addAll(createFlameList(bombRow, bombCol, 1, 0, explosionRadius, map, FlameType.VERTICAL_FLAME, flameObserver));
+
+        flames.addAll(createFlameList(bombRow, bombCol, 0, 1, explosionRadius, map, FlameType.HORIZONTHAL_FLAME, flameObserver));
+        flames.addAll(createFlameList(bombRow, bombCol, 0, -1, explosionRadius, map, FlameType.HORIZONTHAL_FLAME, flameObserver));
+
     }
 
-    private ArrayList<Flame> createFlameList(int row, int col, int rowIncrement, int colIncrement, int explosionRadius, Map map, FlameType flameType, Observer obsesrver) {
+    private ArrayList<Flame> createFlameList(int row, int col, int rowIncrement, int colIncrement, int explosionRadius, Map map, FlameType flameType, Observer observer) {
         ArrayList<Flame> flameList = new ArrayList<>();
         Tile tile;
 
@@ -69,25 +64,19 @@ public class Explosion extends Observable implements Observer {
                 }
             }
 
-            flameList.add(new Flame(col * GamePanel.tileSize, row * GamePanel.tileSize, flameType, obsesrver));
+            flameList.add(new Flame(col * GamePanel.tileSize, row * GamePanel.tileSize, flameType, observer));
 
         }
 
         return flameList;
     }
 
-    public ArrayList<Flame> getFlameRadius() {
+    public ArrayList<Flame> getExplosionFlames() {
         return flames;
     }
 
     public void removeExplosion(Explosion explosion) {
-        explosions.removeIf(explosion1 -> explosion1.equals(explosion));
-    }
-
-    public void draw(Graphics2D g2) {
-        for(Flame flames: flames) {
-            flames.draw(g2);
-        }
+        explosions.remove(explosion);
     }
 
     @Override

@@ -3,6 +3,7 @@ package main;
 import Bomb.Bomb;
 import Controllers.*;
 import Explosion.Explosion;
+import Flames.Flame;
 import PowerUp.PowerUp;
 import player.Player;
 import tile.DestructibleBlock;
@@ -35,6 +36,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     private final DestructibleBlocksController destructibleBlocksController;
     private final BombController bombController;
+    private final FlameController flameController;
     private final ExplosionController explosionController;
     private final PlayerController playerController;
     private final GameStateController gameStateController;
@@ -82,10 +84,9 @@ public class GamePanel extends JPanel implements Runnable {
         map = Map.getInstance(this, "/maps/level_1.txt", destructibleBlocksController);
         destructibleBlocksController.setMap(map);
 
+        flameController = new FlameController(this);
 
-
-
-        explosionController = new ExplosionController(this, player, map);
+        explosionController = new ExplosionController(this, player, map, flameController);
         bombController = new BombController(this, player, explosionController);
 
         CollisionDetector collisionDetector = new CollisionDetector(map, bombController);
@@ -102,8 +103,6 @@ public class GamePanel extends JPanel implements Runnable {
     public ArrayList<PowerUp> getPowerUps() {
         return powerUps;
     }
-
-    public void addBomb (Bomb b) {bombs.add(b);}
     public void addPowerUp(PowerUp powerUp) {
         this.powerUps.add(powerUp);
     }
@@ -170,7 +169,7 @@ public class GamePanel extends JPanel implements Runnable {
 
             bombController.updateAnimation();
 
-            explosionController.updateAnimation();
+            flameController.updateAnimation();
 
         }
         if(gameState == pauseState) {
@@ -192,7 +191,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         DestructibleBlock.destructibleBlocks.forEach(db -> db.draw(g2));
 
-        explosions.forEach(e -> e.draw(g2));
+        Flame.flames.forEach(flame -> flame.draw(g2));
 
         player.draw(g2);
 

@@ -1,17 +1,18 @@
 
 package Flames;
 
-import Animation.AnimationMessages;
-import Animation.CycledAnimation;
 import Animation.CycledReversedAnimation;
 import entityGerarchy.NotMovingAnimatedEntity;
 import main.GamePanel;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
 public class Flame extends NotMovingAnimatedEntity {
+
+    public static ArrayList<Flame> flames = new ArrayList<>();
 
     protected FlameType flameType;
 
@@ -19,8 +20,12 @@ public class Flame extends NotMovingAnimatedEntity {
         super(worldPositionX, worldPositionY, GamePanel.tileSize, GamePanel.tileSize, 0, 0, flameType.getAnimationPath(), 10, observer);
         this.flameType = flameType;
         animation = new CycledReversedAnimation(flameType.getAnimationPath(), 6, this, 2);
+        flames.add(this);
 
+    }
 
+    public static void removeFlame(Flame flame) {
+        flames.remove(flame);
     }
 
     public void draw(Graphics2D g2) {

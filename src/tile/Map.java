@@ -1,5 +1,6 @@
 package tile;
 
+import Animation.AnimationMessages;
 import Controllers.DestructibleBlocksController;
 import Controllers.MapController;
 import main.GamePanel;
@@ -19,8 +20,8 @@ public class Map extends Observable{
 
     private TileType[][] mapTileNum;
 
-    private Tile[][] map;
-    private DestructibleBlocksController destructibleBlocksController;
+    private final Tile[][] map;
+    private final DestructibleBlocksController destructibleBlocksController;
 
     public static Map getInstance(GamePanel gamePanel, String mapName, DestructibleBlocksController destructibleBlocksController) {
         if(instance == null) {
@@ -101,10 +102,7 @@ public class Map extends Observable{
                     }
                     case LIMIT_BLOCK -> map[row][col] = new LimitBlock(row, col);
 
-                    case DESTRUCTIBLE_BLOCK -> {
-                        if(getMapTileNum(row - 1, col) == TileType.SOLID_BLOCK || getMapTileNum(row - 1, col) == TileType.LIMIT_BLOCK) map[row][col] = new DestructibleBlock(row, col, true, destructibleBlocksController );
-                        else map[row][col] = new DestructibleBlock(row, col, false, destructibleBlocksController);
-                    }
+                    case DESTRUCTIBLE_BLOCK -> map[row][col] = getDestructibleBlock(row, col);
 
                     case SOLID_BLOCK -> map[row][col] = new SolidBlock(row, col);
                 }
@@ -116,26 +114,58 @@ public class Map extends Observable{
 
     }
 
+    /**
+     * This function takes as parameters a position inside the map matrix and a TileType, then it checks if the tile on
+     * that position is not the same type as the one passed as parameter, and if so, it assigns a new tile of the
+     * specified type in that position.
+     * @param row The row of the tile to replace.
+     * @param col The column of the tile to replace.
+     * @param tileType The type the new tile will be.
+     */
+    public void replaceTile(int row, int col, TileType tileType) {
+        switch (tileType) {
+            case WALKABLE_BLOCK -> {
+                if(!checkTile(row, col, tileType)) map[row][col] = getWalkableBlock(row, col);
+                if(map[row + 1][col].getTileType() == TileType.WALKABLE_BLOCK) {
+                    WalkableBlock.reassignType(this, (WalkableBlock) map[row + 1][col]);
+                    setChanged();
+                    notifyObservers(map[row + 1][col]);
+                }
+            }
+            case LIMIT_BLOCK -> {
+                if(!checkTile(row, col, tileType)) map[row][col] = new LimitBlock(row, col);
+            }
+            case DESTRUCTIBLE_BLOCK -> {
+                if(!checkTile(row, col, tileType)) map[row][col] = getDestructibleBlock(row, col);
+                if(map[row + 1][col].getTileType() == TileType.WALKABLE_BLOCK) {
+                    WalkableBlock.reassignType(this, (WalkableBlock) map[row + 1][col]);
+                    setChanged();
+                    notifyObservers(map[row + 1][col]);
+                }
+
+            }
+        }
+        setChanged();
+        notifyObservers(map[row][col]);
+    }
+
+    public boolean checkTile(int row, int col, TileType tileType) {
+        return map[row][col].getTileType() == tileType;
+    }
+
+
     public void setTile(int y, int x, TileType tileType) {
         mapTileNum[y][x] = tileType;
         setChanged();
         notifyObservers();
     }
 
-    public void removeDestructibleBlock(DestructibleBlock destructibleBlock) {
-        int row = destructibleBlock.getRow();
-        int col = destructibleBlock.getCol();
-
-        map[row][col] = getWalkableBlock(row, col);
-        DestructibleBlock.destructibleBlocks.remove(destructibleBlock);
-    }
-
 
     /**
      * This function looks at the map matrix to decide what WalkableBlock to instantiate.
-     * @param row
-     * @param col
-     * @return WalkableBlock
+     * @param row The row of the tile to replace.
+     * @param col The row of the tile to replace.
+     * @return The new WalkableBlock Tile.
      */
     private WalkableBlock getWalkableBlock(int row, int col) {
         WalkableBlock walkableBlock;
@@ -145,9 +175,16 @@ public class Map extends Observable{
         return walkableBlock;
     }
 
+    private DestructibleBlock getDestructibleBlock(int row, int col) {
+        DestructibleBlock destructibleBlock;
+        if(getMapTileNum(row - 1, col) == TileType.SOLID_BLOCK || getMapTileNum(row - 1, col) == TileType.LIMIT_BLOCK) destructibleBlock = new DestructibleBlock(row, col, true, destructibleBlocksController );
+        else destructibleBlock = new DestructibleBlock(row, col, false, destructibleBlocksController);
+        return destructibleBlock;
+    }
+
 
     public void draw(Graphics2D g2) {
-        Arrays.stream(map).toList().stream()
+        Arrays.stream(map).toList()
                 .forEach(tiles -> Arrays.stream(tiles)
                                 .forEach(tile -> tile.draw(g2)));
     }
