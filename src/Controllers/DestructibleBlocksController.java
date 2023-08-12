@@ -1,55 +1,26 @@
 package Controllers;
 
 import Animation.*;
-import Controllers.ControllersGerarchy.AnimatedEntityController;
+import Controllers.ControllersGerarchy.AnimatedTileController;
 import main.GamePanel;
 import tile.DestructibleBlock;
 import tile.Map;
 import tile.TileType;
+import tile.WalkableBlock;
 
-import java.util.Iterator;
 import java.util.Observable;
 
-public class DestructibleBlocksController extends AnimatedEntityController {
+public class DestructibleBlocksController extends AnimatedTileController {
 
     private Map map;
 
-    private static int spriteCounter = 0;
-
     public DestructibleBlocksController(GamePanel gamePanel) {
-        super(gamePanel);
+        super(gamePanel, DestructibleBlock.destructibleBlocks);
 
     }
 
     public void setMap(Map map) {
         this.map = map;
-    }
-
-    @Override
-    public void updateAnimation() {
-        spriteCounter ++;
-        if(spriteCounter % DestructibleBlock.destructibleBlocks.get(0).getAnimation().getAnimationSpeed() == 0) {
-
-            Iterator<DestructibleBlock> iterator = DestructibleBlock.destructibleBlocks.iterator();
-
-            while(iterator.hasNext()) {
-
-                DestructibleBlock db = iterator.next();
-
-                Animation animation = db.getAnimation();
-
-                if(db.isExploded() && animation.isLastSprite()) {
-
-                    iterator.remove();
-                    map.setTile(db.getRow(), db.getCol(), TileType.WALKABLE_BLOCK);
-                }
-                else {
-                    animation.setNextSprite();
-                }
-
-            }
-            spriteCounter = 0;
-        }
     }
 
 
@@ -58,6 +29,11 @@ public class DestructibleBlocksController extends AnimatedEntityController {
         DestructibleBlock db = (DestructibleBlock) o;
         switch((AnimationMessages) arg) {
             case REPAINT -> gamePanel.repaint(db.getPositionXOnScreen(), db.getPositionYOnScreen(), GamePanel.tileSize, GamePanel.tileSize);
+            case REMOVE -> {
+                db.removeDestructibleBlock();
+                map.replaceTile(db.getRow(), db.getCol(), TileType.WALKABLE_BLOCK);
+            }
+
         }
     }
 }

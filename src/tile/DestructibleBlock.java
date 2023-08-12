@@ -14,12 +14,20 @@ public class DestructibleBlock extends AnimatedTile {
 
     private boolean exploded;
     public DestructibleBlock(int row, int col, boolean imageType, Observer observer) {
-        super(TileType.WALKABLE_BLOCK, row, col, true, true, true, findPath(imageType));
+        super(TileType.DESTRUCTIBLE_BLOCK, row, col, true, true, true, findPath(imageType));
 
         exploded = false;
 
-        destructibleBlocks.add(this);
         addObserver(observer);
+
+        animate = () -> {
+            updateCallCounter++;
+            if(updateCallCounter % animation.getAnimationSpeed() == 0) {
+                animation.setNextSprite();
+            }
+        };
+
+        destructibleBlocks.add(this);
 
     }
 
@@ -31,8 +39,8 @@ public class DestructibleBlock extends AnimatedTile {
 
     }
 
-    public static void removeDestructibleBlock(DestructibleBlock destructibleBlock) {
-        destructibleBlocks.remove(destructibleBlock);
+    public void removeDestructibleBlock() {
+        destructibleBlocks.remove(this);
     }
 
     public boolean isExploded() {

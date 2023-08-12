@@ -1,14 +1,7 @@
 package entityGerarchy;
 
 import main.GamePanel;
-import player.Player;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Observer;
 
 import Animation.*;
@@ -17,10 +10,26 @@ public abstract class NotMovingAnimatedEntity extends Entity implements Observer
 
     protected Animation animation;
 
+    public Animate animate;
+
+    protected int updateCallCounter;
+
     public NotMovingAnimatedEntity(int worldPositionX, int worldPositionY, int rectangleWidth, int rectangleHeight, int solidAreaDefaultX, int solidAreaDefaultY, String directoryPath, int animationSpeed, Observer o) {
         super(worldPositionX, worldPositionY, rectangleWidth, rectangleHeight, solidAreaDefaultX, solidAreaDefaultY);
         animation = new Animation(directoryPath, animationSpeed, this);
+        updateCallCounter = 0;
         addObserver(o);
+
+        animate = () -> {
+            updateCallCounter++;
+
+            if(updateCallCounter % animation.getAnimationSpeed() == 0) {
+                animation.setNextSprite();
+                updateCallCounter = 0;
+            }
+
+        };
+
 
     }
 
