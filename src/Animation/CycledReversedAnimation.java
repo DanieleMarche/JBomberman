@@ -31,20 +31,19 @@ public class CycledReversedAnimation extends CycledAnimation{
     public void setNextSprite() {
 
         setChanged();
-        if(cycles == 0) {
-            notifyObservers(AnimationMessages.REMOVE);
-        }
-        else {
-            if (currentSprite == numSprites - 1) {
-                Collections.reverse(sprites);
-                cycles -= 1;
-                currentSprite = 0;
-
-            } else {
-                currentSprite++;
+        if (currentSprite == numSprites - 1) {
+            Collections.reverse(sprites);
+            cycles -= 1;
+            if(cycles == 0) {
+                notifyObservers(AnimationMessages.REMOVE);
+                return;
             }
+            currentSprite = 1;
 
-            notifyObservers(AnimationMessages.REPAINT);
+        } else {
+            currentSprite++;
         }
+
+        notifyObservers(AnimationMessages.REPAINT);
     }
 }

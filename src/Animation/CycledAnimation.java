@@ -40,18 +40,18 @@ public class CycledAnimation extends Animation{
     public void setNextSprite() {
 
         setChanged();
-        if(cycles == 0) {
-            notifyObservers(AnimationMessages.REMOVE);
-        }
-        else {
-            if (currentSprite == numSprites - 1) {
-                cycles -= 1;
-                currentSprite = 0;
-            } else {
-                currentSprite += 1;
+        if (currentSprite == numSprites - 1) {
+            cycles -= 1;
+            if(cycles == 0) {
+                notifyObservers(AnimationMessages.REMOVE);
+                return;
             }
-            notifyObservers(AnimationMessages.REPAINT);
+            currentSprite = 0;
+        } else {
+            currentSprite += 1;
         }
+        notifyObservers(AnimationMessages.REPAINT);
+
     }
 
 }
