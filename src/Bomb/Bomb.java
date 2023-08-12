@@ -2,7 +2,6 @@ package Bomb;
 
 import entityGerarchy.NotMovingAnimatedEntity;
 import main.GamePanel;
-import player.Player;
 import Animation.*;
 import java.awt.*;
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ public class Bomb extends NotMovingAnimatedEntity {
 
         passedInto = false;
 
-        animation = new CycledReversedAnimation(animation, this, 6);
+        animation = new CycledReversedAnimation(animation, this, 4);
 
     }
 
