@@ -1,4 +1,5 @@
 package tile;
+import Utils.ImageUtils;
 import tile.tileGerarchy.SingleImageTile;
 
 public class WalkableBlock extends SingleImageTile {
@@ -11,9 +12,15 @@ public class WalkableBlock extends SingleImageTile {
 
     }
 
-    public WalkableBlock (int row, int col) {
+    public static void reassignType(Map map, WalkableBlock walkableBlock) {
+        int row = walkableBlock.row;
+        int col = walkableBlock.col;
 
-        super(TileType.WALKABLE_BLOCK, row, col, false, false, true, directoryPath + "1.png");
+        switch (map.getTile(row - 1, col).getTileType()) {
+            case WALKABLE_BLOCK -> walkableBlock.image = ImageUtils.loadImage(directoryPath + "1.png");
+            case DESTRUCTIBLE_BLOCK -> walkableBlock.image = ImageUtils.loadImage(directoryPath + "3.png");
+            case LIMIT_BLOCK, SOLID_BLOCK -> walkableBlock.image = ImageUtils.loadImage(directoryPath + "2.png");
+        }
 
     }
 
