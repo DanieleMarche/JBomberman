@@ -1,38 +1,50 @@
 package Controllers;
 
 import Animation.*;
-import Controllers.ControllersGerarchy.AnimatedTileController;
-import main.GamePanel;
-import tile.DestructibleBlock;
-import tile.Map;
-import tile.TileType;
-import tile.WalkableBlock;
+import Controllers.ControllersGerarchy.TilesController;
+import Bomberman.Player;
+import Tile.DestructibleBlock;
+import Tile.Map;
+import Portal.Portal;
+import Tile.TileType;
 
 import java.util.Observable;
 
-public class DestructibleBlocksController extends AnimatedTileController {
+public class DestructibleBlocksController extends TilesController<DestructibleBlock> {
 
-    private Map map;
+    public static DestructibleBlocksController instance = null;
 
-    public DestructibleBlocksController(GamePanel gamePanel) {
-        super(gamePanel, DestructibleBlock.destructibleBlocks);
-
+    public static DestructibleBlocksController getInstance(){
+        if(instance == null) {
+            instance = new DestructibleBlocksController();
+        }
+        return instance;
     }
 
-    public void setMap(Map map) {
-        this.map = map;
+    private DestructibleBlocksController() {
+        super(AssetManager.getInstance().getDestructibleBlocks());
     }
-
 
     @Override
     public void update(Observable o, Object arg) {
-        DestructibleBlock db = (DestructibleBlock) o;
+        DestructibleBlock db;
         switch((AnimationMessages) arg) {
-            case REPAINT -> gamePanel.repaint(db.getPositionXOnScreen(), db.getPositionYOnScreen(), GamePanel.tileSize, GamePanel.tileSize);
-            case REMOVE -> {
-                db.removeDestructibleBlock();
-                map.replaceTile(db.getRow(), db.getCol(), TileType.WALKABLE_BLOCK);
+            case REPAINT_GAME -> {
+                db = (DestructibleBlock) o;
+                setChanged();
+                notifyObservers(db);
             }
+
+            case REMOVE_ELEMENT -> {
+                db = (DestructibleBlock) o;
+                tiles.remove(db);
+                Player.getInstance().addScore(db);
+                AssetManager.getInstance().getMap().replaceTile(db.getRow(), db.getCol(), TileType.WALKABLE_BLOCK);
+                if (db.hasPortal()) {
+                    Portal.getInstance().setVisibility(true);
+                }
+            }
+            case GAME_WON, GAME_LOST -> tiles.clear();
 
         }
     }

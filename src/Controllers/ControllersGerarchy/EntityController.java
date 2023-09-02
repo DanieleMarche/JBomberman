@@ -2,37 +2,26 @@ package Controllers.ControllersGerarchy;
 
 import entityGerarchy.Entity;
 import entityGerarchy.MovingEntity;
-import main.GamePanel;
+import entityGerarchy.NotMovingAnimatedEntity;
+import entityGerarchy.NotMovingEntity;
 
 import java.awt.*;
+import java.util.Observable;
 import java.util.Observer;
 
-public abstract class EntityController implements Observer {
-    protected GamePanel gamePanel;
+public abstract class EntityController<T extends Entity> extends Controller {
     protected CollisionChecker collisionChecker;
 
-    public EntityController(GamePanel gamePanel){
-
-        this.gamePanel = gamePanel;
-
-    }
-
-    protected boolean checkCollisionMovingAndNotMoving(MovingEntity me, Entity e) {
-
-        Rectangle movingEntityBounds = (Rectangle) me.getBounds().clone();
-
-        switch(me.getDirection()) {
-            case UP -> movingEntityBounds.y -= me.getSpeed();
-            case DOWN -> movingEntityBounds.y += me.getSpeed();
-            case LEFT -> movingEntityBounds.x -= me.getSpeed();
-            case RIGHT -> movingEntityBounds.x += me.getSpeed();
-        }
-
-        return movingEntityBounds.intersects(e.getBounds());
+    public EntityController(){
     }
 
     public CollisionChecker getCollisionChecker() {
         return collisionChecker;
+    }
+
+    protected void repaint(T nmae) {
+        setChanged();
+        notifyObservers(nmae);
     }
 
 }

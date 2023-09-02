@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Observer;
 
-public class CycledReversedAnimation extends CycledAnimation{
+public class CycledReversedAnimation extends CycledAnimation {
 
     public CycledReversedAnimation(ArrayList<BufferedImage> sprites, int animationSpeed, Observer o, int cycles) {
         super(sprites, animationSpeed, o, cycles);
@@ -23,8 +23,8 @@ public class CycledReversedAnimation extends CycledAnimation{
         super(directoryPath, animationSpeed, o, cycles);
     }
 
-    public CycledReversedAnimation(Animation animation, Observer observer, int cycles) {
-        super(animation.getSprites(), animation.getDefaultSpriteNum(), animation.getAnimationSpeed(), observer, cycles);
+    public CycledReversedAnimation(LoopAnimation loopAnimation, Observer observer, int cycles) {
+        super(loopAnimation.getSprites(), loopAnimation.getDefaultSpriteIndex(), loopAnimation.getAnimationSpeed(), observer, cycles);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class CycledReversedAnimation extends CycledAnimation{
             Collections.reverse(sprites);
             cycles -= 1;
             if(cycles == 0) {
-                notifyObservers(AnimationMessages.REMOVE);
+                notifyObservers(AnimationMessages.REMOVE_ELEMENT);
                 return;
             }
             currentSprite = 1;
@@ -44,6 +44,6 @@ public class CycledReversedAnimation extends CycledAnimation{
             currentSprite++;
         }
 
-        notifyObservers(AnimationMessages.REPAINT);
+        notifyObservers(AnimationMessages.REPAINT_GAME);
     }
 }

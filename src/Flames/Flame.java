@@ -2,35 +2,38 @@
 package Flames;
 
 import Animation.CycledReversedAnimation;
+import Controllers.CollisionDetector;
+import entityGerarchy.Dieable;
 import entityGerarchy.NotMovingAnimatedEntity;
-import main.GamePanel;
+import main.GameView;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
 public class Flame extends NotMovingAnimatedEntity {
 
-    public static ArrayList<Flame> flames = new ArrayList<>();
-
     protected FlameType flameType;
 
-    public Flame(int worldPositionX, int worldPositionY,FlameType flameType, Observer observer) {
-        super(worldPositionX, worldPositionY, GamePanel.tileSize, GamePanel.tileSize, 0, 0, flameType.getAnimationPath(), 10, observer);
+    public Flame(int worldPositionX, int worldPositionY, FlameType flameType, Observer observer) {
+        super(worldPositionX, worldPositionY, GameView.tileSize, GameView.tileSize, GameView.tileSize / 2, GameView.tileSize / 2, GameView.tileSize / 4, GameView.tileSize / 4, flameType.getAnimationPath(), 0,  5, observer);
         this.flameType = flameType;
-        animation = new CycledReversedAnimation(flameType.getAnimationPath(), 6, this, 2);
-        flames.add(this);
+        loopAnimation = new CycledReversedAnimation(flameType.getAnimationPath(), 10, this, 2);
 
-    }
+        collisionChecker = movingEntity -> {
 
-    public static void removeFlame(Flame flame) {
-        flames.remove(flame);
+                if(CollisionDetector.checkcollisionBetweenMovingentityAndOtherEntity(movingEntity, this)) {
+                    if(movingEntity instanceof Dieable)
+                        ((Dieable) movingEntity).die();
+                }
+
+        };
+
     }
 
     public void draw(Graphics2D g2) {
 
-        g2.drawImage(animation.getCurrentImage(), worldPositionX, worldPositionY, GamePanel.tileSize, GamePanel.tileSize, null);
+        g2.drawImage(loopAnimation.getCurrentImage(), worldPositionX, worldPositionY, GameView.tileSize, GameView.tileSize, null);
 
     }
 

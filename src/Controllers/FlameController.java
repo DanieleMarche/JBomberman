@@ -1,27 +1,54 @@
 package Controllers;
 
 import Animation.AnimationMessages;
-import Controllers.ControllersGerarchy.AnimatedEntityController;
+import Controllers.ControllersGerarchy.CollectionOfEntitiesController;
 import Flames.Flame;
-import main.GamePanel;
+import entityGerarchy.Dieable;
 
 import java.util.Observable;
-import java.util.Observer;
 
-public class FlameController extends AnimatedEntityController<Flame> {
-    public FlameController(GamePanel gamePanel) {
-        super(gamePanel, Flame.flames);
+public class FlameController extends CollectionOfEntitiesController<Flame> {
+
+    private static FlameController instance = null;
+
+    public static  FlameController getInstance() {
+        if(instance == null) {
+            instance = new FlameController();
+        }
+        return instance;
+    }
+
+    private  FlameController() {
+
+        super(AssetManager.getInstance().getFlames());
+
+        collisionChecker = movingEntity -> {
+            entities.forEach(flame -> {
+                if(CollisionDetector.checkcollisionBetweenMovingentityAndOtherEntity(movingEntity, flame)) {
+                    if(movingEntity instanceof Dieable)
+                        ((Dieable) movingEntity).die();
+                }
+
+            });
+
+        };
     }
 
     @Override
     public void update(Observable o, Object arg) {
-        Flame flame = (Flame) o;
+        Flame flame;
         switch ((AnimationMessages) arg) {
-            case REMOVE -> {
-                Flame.removeFlame(flame);
-                gamePanel.repaint(flame.getWorldPositionX(), flame.getWorldPositionY(), GamePanel.tileSize, GamePanel.tileSize);
+            case REMOVE_ELEMENT -> {
+                flame = (Flame) o;
+                entities.remove(flame);
+                repaint(flame);
             }
-            case REPAINT -> gamePanel.repaint(flame.getWorldPositionX(), flame.getWorldPositionY(), GamePanel.tileSize, GamePanel.tileSize);
+            case REPAINT_GAME -> {
+                flame = (Flame) o;
+                repaint(flame);
+            }
+            case GAME_LOST, GAME_WON -> entities.clear();
+
         }
     }
 }

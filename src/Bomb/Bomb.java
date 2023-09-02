@@ -1,44 +1,63 @@
 package Bomb;
 
+import Controllers.*;
+import Explosion.Explosion;
+import enemy.Enemy;
 import entityGerarchy.NotMovingAnimatedEntity;
-import main.GamePanel;
+import main.GameView;
 import Animation.*;
+import Bomberman.Player;
+
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Observable;
-import java.util.Observer;
+
+import static Controllers.CollisionDetector.checkcollisionBetweenMovingentityAndOtherEntity;
 
 
 public class Bomb extends NotMovingAnimatedEntity {
 
-    public static ArrayList<Bomb> bombs = new ArrayList<>();
+    private final Player player;
     private boolean passedInto;
 
-    public static Bomb getInstance(int worldX, int worldY, Observer observer) {
-
-        for(Bomb b: bombs) {
-            if(b.getWorldPositionX() == worldX && b.getWorldPositionY() == worldY) {
-                return b;
-            }
-        }
-
-        Bomb b = new Bomb(worldX, worldY, observer);
-        bombs.add(b);
-        return b;
-
-    }
-
-    private Bomb(int worldX, int worldY, Observer observer) {
-        super(worldX, worldY, GamePanel.tileSize, GamePanel.tileSize, 0, 0, "res/Bomb", 15, observer);
+    public Bomb(int worldX, int worldY, Player player) {
+        super(worldX, worldY, "res/Bomb", 15, BombController.getInstance());
 
         passedInto = false;
 
-        animation = new CycledReversedAnimation(animation, this, 4);
+        this.player = player;
+
+        loopAnimation = new CycledReversedAnimation(loopAnimation, this, 4);
+
+        collisionChecker = movingEntity -> {
+
+
+                if (movingEntity instanceof Player) {
+                    if (CollisionDetector.checkcollisionBetweenMovingentityAndOtherEntity(movingEntity, this) && passedInto) {
+                        movingEntity.activateCollision();
+
+                    }
+
+                    if (!CollisionDetector.checkcollisionBetweenMovingentityAndOtherEntity(movingEntity, this) && !passedInto && movingEntity.equals(player)) {
+                        passedInto = true;
+                    }
+                }
+
+                if (movingEntity instanceof Enemy && checkcollisionBetweenMovingentityAndOtherEntity(movingEntity, this)) {
+                    Rectangle intersection = getBounds().union(movingEntity.getBounds());
+                    if(intersection.height * intersection.width == (GameView.tileSize*GameView.tileSize)*2) {
+                        movingEntity.activateCollision();
+                    }
+                }
+
+
+
+
+    };
 
     }
 
-    public static void removeBomb(Bomb bomb) {
-        bombs.remove(bomb);
+    public Player getPlayer() {
+        return player;
     }
 
     public boolean isPassedInto() {
@@ -49,9 +68,14 @@ public class Bomb extends NotMovingAnimatedEntity {
         passedInto = true;
     }
 
+    public void explode ()  {
+        if(player != null) player.increaseRemainingBombsAtSameTime();
+        AssetManager.getInstance().addExplosion(new Explosion(getCol(), getRow(), Player.getExplosionRadius(), this, FlameController.getInstance()));
+    }
+
     public void draw(Graphics2D g2) {
 
-        g2.drawImage(animation.getCurrentImage(), worldPositionX, worldPositionY, GamePanel.tileSize, GamePanel.tileSize, null);
+        g2.drawImage(loopAnimation.getCurrentImage(), worldPositionX, worldPositionY, GameView.tileSize, GameView.tileSize, null);
 
     }
 

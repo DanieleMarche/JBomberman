@@ -7,6 +7,13 @@ import static java.awt.event.KeyEvent.*;
 
 public class KeyHandler implements KeyListener {
 
+    private static KeyHandler instance = null;
+
+    public static KeyHandler getInstance() {
+        if(instance == null) instance = new KeyHandler();
+        return instance;
+    }
+
     private boolean aMovementKeyPressed, upPressed, downPressed, leftPressed, rightPressed, bombDropAsked, stopPlaying;
 
     public KeyHandler() {
@@ -31,18 +38,15 @@ public class KeyHandler implements KeyListener {
 
         if(code == VK_W) {
             upPressed = true;
-
         }
         if(code == KeyEvent.VK_S) {
             downPressed = true;
-
         }
         if(code == KeyEvent.VK_A) {
             leftPressed = true;
         }
         if(code == KeyEvent.VK_D) {
             rightPressed = true;
-
         }
 
 
@@ -72,8 +76,8 @@ public class KeyHandler implements KeyListener {
         if(code == VK_B) {
             bombDropAsked = true;
         }
-        if (code == VK_K) {
-            stopPlaying = !stopPlaying;
+        if (code == VK_P) {
+            stopPlaying = true;
         }
 
         if(!upPressed && !downPressed &&!rightPressed && !leftPressed) {aMovementKeyPressed = false;}
@@ -109,8 +113,16 @@ public class KeyHandler implements KeyListener {
         bombDropAsked = false;
     }
 
+    public void deactivateStopPlaying() {
+        stopPlaying = false;
+    }
+
     public boolean stopPLayingAsked() {
         return stopPlaying;
+    }
+
+    public static void removeInstance() {
+        instance = null;
     }
 
 }

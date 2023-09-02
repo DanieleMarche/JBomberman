@@ -1,7 +1,12 @@
 package Animation;
 
 public enum AnimationMessages {
+    REPAINT_TOPBRAID,
 
-    REPAINT,
-    REMOVE
+    REPAINT_GAME,
+    REMOVE_ELEMENT,
+
+    GAME_WON,
+
+    GAME_LOST
 }

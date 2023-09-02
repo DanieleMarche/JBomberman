@@ -2,44 +2,36 @@ package Controllers;
 
 import Animation.*;
 
-import Controllers.ControllersGerarchy.AnimatedEntityController;
+import Controllers.ControllersGerarchy.CollectionOfEntitiesController;
+import Controllers.ControllersGerarchy.Controller;
 import Explosion.Explosion;
 import Flames.Flame;
-import main.GamePanel;
-import player.Player;
-import tile.Map;
 
 import java.util.*;
 
-import static Explosion.Explosion.explosions;
+public class ExplosionController extends Controller {
 
-public class ExplosionController extends AnimatedEntityController<Flame> {
+    private static ExplosionController instance = null;
 
-    private GamePanel gamePanel;
-    private final Player player;
-    private final Map map;
+    ArrayList<Explosion> explosions;
 
-    private final FlameController flameController;
-
-    public ExplosionController(GamePanel gamePanel, Player player, Map map, FlameController flameController) {
-        super(gamePanel, Flame.flames);
-        this.gamePanel = gamePanel;
-        this.player = player;
-        this.map = map;
-        this.flameController = flameController;
+    public static ExplosionController getInstance() {
+        if (instance == null) {
+            instance = new ExplosionController();
+        }
+        return instance;
     }
 
-    public void activateExplosion(int col, int row) {
-        explosions.add(new Explosion(col, row, player.getExplosionRadius(), map, this, flameController));
+    private ExplosionController() {
+        explosions = AssetManager.getInstance().getExplosions();
     }
 
     @Override
     public void update(Observable o, Object arg) {
-        Explosion explosion = (Explosion) o;
-        switch ((AnimationMessages) arg) {
-            case REMOVE -> explosion.removeExplosion(explosion);
-
-            //case REPAINT -> explosion.getExplosionFlames().forEach(flame -> gamePanel.repaint(flame.getWorldPositionX(), flame.getWorldPositionY(), GamePanel.tileSize, GamePanel.tileSize));
+        Explosion explosion;
+        if (Objects.requireNonNull((AnimationMessages) arg) == AnimationMessages.REMOVE_ELEMENT) {
+            explosion = (Explosion) o;
+            explosions.remove(explosion);
         }
 
     }

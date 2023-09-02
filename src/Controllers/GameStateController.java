@@ -1,22 +1,42 @@
 package Controllers;
 
-import main.GamePanel;
+import Animation.AnimationMessages;
+import Controllers.ControllersGerarchy.Controller;
+import main.GameModel;
+import main.GameView;
 
-public class GameStateController {
+import java.util.Observable;
+
+public class GameStateController extends Controller {
+
     private final KeyHandler keyH;
 
-    private final GamePanel gamePanel;
+    private final GameModel gamePanel;
 
-    public GameStateController(KeyHandler keyH, GamePanel gamePanel) {
-        this.gamePanel = gamePanel;
-        this.keyH = keyH;
+
+    public GameStateController(GameModel gameModel, GameView gameView) {
+        gamePanel = gameModel;
+        this.keyH = KeyHandler.getInstance();
+        addObserver(gameView);
     }
 
-    public void checkChangeState() {
+
+    public void updateControl() {
         if(keyH.stopPLayingAsked()) {
-            gamePanel.setPauseState();
-        }else{
-            gamePanel.setPlayState();
+            switch (gamePanel.getGameState()) {
+                case PAUSE -> gamePanel.setGameState(GameModel.GameState.PLAY);
+                case PLAY -> gamePanel.setGameState(GameModel.GameState.PAUSE);
+            }
+            keyH.deactivateStopPlaying();
+        }
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        setChanged();
+        switch((AnimationMessages) arg) {
+            case GAME_WON -> notifyObservers(AnimationMessages.GAME_WON);
+            case GAME_LOST -> notifyObservers(AnimationMessages.GAME_LOST);
         }
     }
 }

@@ -1,38 +1,61 @@
 package Controllers;
 
-import Controllers.ControllersGerarchy.EntityController;
+import Animation.AnimationMessages;
+import Controllers.ControllersGerarchy.CollectionOfEntitiesController;
 import PowerUp.PowerUp;
 import entityGerarchy.MovingEntity;
-import main.GamePanel;
-import player.Player;
+import Bomberman.Player;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Observable;
 
-public class PowerUpsController extends EntityController {
+public class PowerUpsController extends CollectionOfEntitiesController<PowerUp> {
 
-    public PowerUpsController(GamePanel gamePanel) {
-        super(gamePanel);
+    private static PowerUpsController instance = null;
 
-        collisionChecker = (MovingEntity me) -> {
-            if(me instanceof Player) {
-
-                Iterator<PowerUp> i = gamePanel.getPowerUps().iterator();
-
-                while(i.hasNext()) {
-                    PowerUp pUp = i.next();
-
-                    if(checkCollisionMovingAndNotMoving(me, pUp)) {
-                        switch(pUp.getType()) {
-                            case MORE_SPEED -> me.increaseSpeed();
-                            case MORE_BOMB_AT_SAME_TIME -> ((Player) me).increaseBombAtSameTime();
-                            case MORE_BOMB_RADIUS -> ((Player) me).increaseExplosionRadius();
-                        }
-
-                        i.remove();
-                    }
-                }
-            }
-        };
+    public static PowerUpsController getInstance() {
+        if(instance == null) {
+            instance = new PowerUpsController();
+        }
+        return instance;
     }
 
+    private PowerUpsController() {
+        super(AssetManager.getInstance().getPowerUps());
+
+        collisionChecker = (MovingEntity player) -> {
+
+            if(player instanceof  Player) {
+                ArrayList<PowerUp> powerUpsCopy = new ArrayList<>(entities);
+                powerUpsCopy.forEach(powerUp -> {
+                    if(CollisionDetector.checkcollisionBetweenMovingentityAndOtherEntity(player, powerUp) && powerUp.isVisible()) {
+                        AudioManager.getInstance().play("res/sounds/Super_Bomberman_Sound_Effects/item-get.wav");
+                        powerUp.powerUpActivate((Player) player);
+                        update(powerUp, AnimationMessages.REMOVE_ELEMENT);
+                    }
+                });
+            }
+
+
+        };
+
+    }
+
+
+    @Override
+    public void update(Observable o, Object arg) {
+        PowerUp powerUp;
+        switch((AnimationMessages) arg) {
+            case REPAINT_GAME -> {
+                powerUp = (PowerUp) o;
+                repaint(powerUp);
+            }
+            case REMOVE_ELEMENT -> {
+                powerUp = (PowerUp) o;
+                entities.remove(powerUp);
+                repaint(powerUp);
+            }
+            case GAME_WON, GAME_LOST -> entities.clear();
+        }
+    }
 }

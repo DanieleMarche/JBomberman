@@ -1,25 +1,30 @@
 package Explosion;
 
+import Controllers.AssetManager;
+import Controllers.AudioManager;
 import Flames.Flame;
 import Flames.FlameType;
-import main.GamePanel;
-import tile.DestructibleBlock;
-import tile.Map;
-import tile.tileGerarchy.Tile;
+import main.GameView;
+import Tile.DestructibleBlock;
+import Tile.Map;
+import Tile.tileGerarchy.Tile;
 
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
 public class Explosion extends Observable implements Observer {
-    public static ArrayList<Explosion> explosions = new ArrayList<>();
     private final ArrayList<Flame> flames;
 
-    public Explosion(int bombCol, int bombRow, int explosionRadius, Map map, Observer observer, Observer flameObserver) {
+    public Explosion(int bombCol, int bombRow, int explosionRadius, Observer observer, Observer flameObserver) {
         addObserver(observer);
 
+        Map map = AssetManager.getInstance().getMap();
+
         flames = new ArrayList<>();
-        flames.add(new Flame(bombCol * GamePanel.tileSize, bombRow * GamePanel.tileSize, FlameType.BOMB_FLAME, flameObserver));
+        Flame centralFlame = new Flame(bombCol * GameView.tileSize, bombRow * GameView.tileSize, FlameType.BOMB_FLAME, flameObserver);
+        AssetManager.getInstance().addFlame(centralFlame);
+        flames.add(centralFlame);
 
         flames.addAll(createFlameList(bombRow, bombCol, -1, 0, explosionRadius, map, FlameType.VERTICAL_FLAME, flameObserver));
 
@@ -27,6 +32,9 @@ public class Explosion extends Observable implements Observer {
 
         flames.addAll(createFlameList(bombRow, bombCol, 0, 1, explosionRadius, map, FlameType.HORIZONTHAL_FLAME, flameObserver));
         flames.addAll(createFlameList(bombRow, bombCol, 0, -1, explosionRadius, map, FlameType.HORIZONTHAL_FLAME, flameObserver));
+
+        AudioManager audioManager = AudioManager.getInstance();
+        audioManager.play("res/sounds/Super_Bomberman_Sound_Effects/bomb-explodes.wav");
 
     }
 
@@ -42,11 +50,11 @@ public class Explosion extends Observable implements Observer {
             tile = map.getTile(row, col);
 
 
-            if (!tile.doesGetFire()){
+            if (!tile.getTileType().isGetFire()){
                 break;
             }
 
-            if(tile.isExplodable() && tile instanceof DestructibleBlock db) {
+            if(tile.getTileType().isExplodable() && tile instanceof DestructibleBlock db) {
                 db.explode();
                 break;
             }
@@ -64,7 +72,9 @@ public class Explosion extends Observable implements Observer {
                 }
             }
 
-            flameList.add(new Flame(col * GamePanel.tileSize, row * GamePanel.tileSize, flameType, observer));
+            Flame f = new Flame(col * GameView.tileSize, row * GameView.tileSize, flameType, observer);
+            flameList.add(f);
+            AssetManager.getInstance().addFlame(f);
 
         }
 
@@ -73,10 +83,6 @@ public class Explosion extends Observable implements Observer {
 
     public ArrayList<Flame> getExplosionFlames() {
         return flames;
-    }
-
-    public void removeExplosion(Explosion explosion) {
-        explosions.remove(explosion);
     }
 
     @Override
