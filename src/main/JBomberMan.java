@@ -3,13 +3,10 @@ package main;
 import javax.swing.*;
 import java.awt.*;
 
-import User.UserController;
 import User.UserModel;
 import Utils.MethodUtils;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-import java.io.FileReader;
-import java.io.IOException;
+import main.MenuPages.*;
+
 import java.util.HashMap;
 
 public class JBomberMan {
@@ -29,29 +26,27 @@ public class JBomberMan {
 
         HashMap<String, Object> gameDataMap = (HashMap<String, Object>) MethodUtils.readJsonMapFromFile("res/user-data.json");
 
-        UserCreationPanel ucp = new UserCreationPanel(cardLayout, window, contentPanel);
-
-
-
 
         if (gameDataMap.isEmpty()) {
+            UserCreationPanel ucp = new UserCreationPanel(cardLayout, window, contentPanel);
             contentPanel.add(ucp, "UserCreationPanel");
             cardLayout.show(contentPanel,"UserCreationPanel");
+        } else{
+            UserModel.getInstance().loadUserData();
+            SuperBombermanMenuPanel sbmp = new SuperBombermanMenuPanel(cardLayout, window, contentPanel, UserModel.getInstance());
+            contentPanel.add(sbmp, "IntroScreen");
+            cardLayout.show(contentPanel, "IntroScreen");
         }
 
-        UserController.getInstance().loadUserData();
+        contentPanel.add(new LevelsPage(cardLayout, window, contentPanel), "LevelsPage");
 
-        GameView gamePanel =  new GameView(cardLayout, window, contentPanel, UserModel.getInstance());
+        contentPanel.add(new Options(cardLayout, window, contentPanel), "OptionsPage");
 
-        SuperBombermanMenuPanel sbmp = new SuperBombermanMenuPanel(cardLayout, window, contentPanel, UserModel.getInstance(), gamePanel);
-        contentPanel.add(sbmp, "IntroScreen");
-        cardLayout.show(contentPanel, "IntroScreen");
+        contentPanel.add(new Statistiche(cardLayout, contentPanel, UserModel.getInstance()), "StatisticsPage");
 
+        contentPanel.add(new LevelWonPanel(cardLayout, window, contentPanel), "LevelWonPanel");
 
-
-
-
-        contentPanel.add(gamePanel, "GameView");
+        contentPanel.add(new LostPanel(cardLayout, window, contentPanel, UserModel.getInstance()), "LostScreen");
 
 
 

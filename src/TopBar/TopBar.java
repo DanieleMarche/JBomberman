@@ -1,5 +1,6 @@
 package TopBar;
 
+import Animation.Drawable;
 import Utils.ImageUtils;
 import Utils.MethodUtils;
 import main.GameView;
@@ -8,10 +9,13 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 
-public class TopBar {
 
-    public static TopBar instance = null;
+/**
+ * This function defines the topbar of the game.
+ */
+public class TopBar implements Drawable {
 
     BufferedImage topBar;
     BufferedImage[] numbers;
@@ -22,15 +26,7 @@ public class TopBar {
 
     BufferedImage[] timer;
 
-    public static TopBar getInstance() {
-        if(instance == null) {
-            instance = new TopBar();
-        }
-        return instance;
-    }
-
-    private TopBar() {
-
+    public TopBar() {
         topBar = ImageUtils.loadImage("res/top-bar/topBar.png");
         numbers = ImageUtils.loadPNGsFromDirectory("res/top-bar/top-bar-numbers").toArray(new BufferedImage[0]);
         currentLifeNumber = numbers[0];
@@ -64,28 +60,35 @@ public class TopBar {
         }
     }
 
-    public static void removeInstance() {
-        instance = null;
-    }
+    @Override
+    public Optional<BufferedImage> getImage() {
+        ArrayList<Point> points = new ArrayList<>();
+        points.add(new Point(0,0));
+        points.add(new Point(176, 9));
+        points.add(new Point(192, 9));
+        points.add(new Point(200, 9));
+        points.add(new Point(50, 9));
 
-    public void draw(Graphics2D g2) {
-
-        g2.drawImage(topBar, 0, 0, topBar.getWidth() * GameView.tileScale, topBar.getHeight() * GameView.tileScale, null);
-
-        g2.drawImage(timer[0], 176 * GameView.tileScale, 9 * GameView.tileScale, timer[0].getWidth() * GameView.tileScale, timer[0].getHeight() * GameView.tileScale, null);
-
-        g2.drawImage(timer[1], 192 * GameView.tileScale, 9 * GameView.tileScale, timer[0].getWidth() * GameView.tileScale, timer[0].getHeight() * GameView.tileScale, null);
-
-        g2.drawImage(timer[2], 200 * GameView.tileScale, 9 * GameView.tileScale, timer[0].getWidth() * GameView.tileScale, timer[0].getHeight() * GameView.tileScale, null);
+        ArrayList<BufferedImage> topBarImages = new ArrayList<>();
+        topBarImages.add(topBar);
+        topBarImages.add(timer[0]);
+        topBarImages.add(timer[1]);
+        topBarImages.add(timer[2]);
+        topBarImages.add(currentLifeNumber);
 
         int i = 0;
-
         for(BufferedImage digit: score){
-            g2.drawImage(digit, ((130  - (i * digit.getWidth())) * GameView.tileScale) , 9 * GameView.tileScale, timer[0].getWidth() * GameView.tileScale, timer[0].getHeight() * GameView.tileScale, null);
+            topBarImages.add(digit);
+            points.add(new Point(((130  - (i * digit.getWidth()))) , 9));
             i++;
         }
 
+        return Optional.of(ImageUtils.combineImages(topBarImages, points, GameView.screenWidth, GameView.topBarHeight));
 
-        g2.drawImage(currentLifeNumber, 50 * GameView.tileScale, 9 * GameView.tileScale, currentLifeNumber.getWidth() * GameView.tileScale, currentLifeNumber.getHeight() * GameView.tileScale, null);
+    }
+
+    @Override
+    public Point getPosition() {
+        return new Point(0,0);
     }
 }

@@ -12,20 +12,43 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+/**
+ * The AudioManager class is responsible for managing audio playback.
+ *
+ * It provides a method to play an audio file.
+ * @Author Daniele Marchetilli
+ */
 public class AudioManager {
 
+    /**
+     * The private static instance of the AudioManager class.
+     */
     private static AudioManager instance;
 
+    /**
+     * Gets the singleton instance of the AudioManager class.
+     *
+     * @return The singleton instance of the AudioManager class.
+     */
     public static AudioManager getInstance() {
         if (instance == null)
             instance = new AudioManager();
         return instance;
     }
 
+    /**
+     * Private constructor to prevent instantiation from outside the class.
+     */
     private AudioManager() {
 
     }
 
+    /**
+     * Plays an audio file adn return its clip class.
+     *
+     * @param filename The name of the audio file to play.
+     * @return The Clip object for the audio file.
+     */
     public Clip play(String filename) {
 
 

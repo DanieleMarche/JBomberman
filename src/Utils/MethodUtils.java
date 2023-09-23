@@ -1,8 +1,5 @@
 package Utils;
 
-import org.json.JSONObject;
-import org.json.JSONTokener;
-
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -10,6 +7,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
+
+/**
+ * This class provides some useful generic method fot the rest of the code.
+ */
 public class MethodUtils {
 
     private static final Random random = new Random();
@@ -62,7 +66,5 @@ public class MethodUtils {
 
         return jsonMap;
     }
-
-
 
 }

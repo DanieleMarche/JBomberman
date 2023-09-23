@@ -11,8 +11,39 @@ import java.util.stream.IntStream;
 
 import static Utils.FileUtils.getAllPNGFileNamesInDirectory;
 
+/**
+ * The `ImageUtils` class contains utility methods for handling image processing and loading operations
+ * within the game.
+ *
+ * @Author Daniele Marchetilli
+ */
 public class ImageUtils {
 
+    public static BufferedImage combineImages(List<BufferedImage> images, List<Point> positions, int width, int height) {
+        // Crea un BufferedImage vuoto con la dimensione specificata
+        BufferedImage combinedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = combinedImage.createGraphics();
+
+        // Disegna le immagini sulla BufferedImage combinata alle posizioni specificate
+        for (int i = 0; i < images.size(); i++) {
+            BufferedImage image = images.get(i);
+            Point position = positions.get(i);
+            g2d.drawImage(image, position.x, position.y, null);
+        }
+
+        g2d.dispose(); // Rilascia le risorse grafiche
+
+        return combinedImage;
+    }
+
+
+
+    /**
+     * Converts non-transparent pixels in the given image to white pixels (255, 255, 255, 255).
+     *
+     * @param image The input image to process.
+     * @return A new BufferedImage with non-transparent pixels converted to white.
+     */
     public static BufferedImage convertNonTransparentToWhite(BufferedImage image) {
         int width = image.getWidth();
         int height = image.getHeight();
@@ -36,6 +67,15 @@ public class ImageUtils {
         return resultImage;
     }
 
+
+    /**
+     * Scales the given image to the specified width and height.
+     *
+     * @param image  The input image to scale.
+     * @param width  The target width of the scaled image.
+     * @param height The target height of the scaled image.
+     * @return A new scaled BufferedImage.
+     */
     public static BufferedImage scaleImage(BufferedImage image, int width, int height) {
         BufferedImage resizedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = resizedImage.createGraphics();
@@ -45,6 +85,12 @@ public class ImageUtils {
     }
 
 
+    /**
+     * Loads a list of PNG images from the specified directory.
+     *
+     * @param path The directory path containing PNG image files.
+     * @return A list of loaded BufferedImage objects.
+     */
     public static List<BufferedImage> loadPNGsFromDirectory(String path) {
         List<String> pngFileNames = getAllPNGFileNamesInDirectory(path);
 
@@ -53,6 +99,12 @@ public class ImageUtils {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Loads an image from the specified file path.
+     *
+     * @param imagePath The path to the image file.
+     * @return The loaded BufferedImage, or null if loading fails.
+     */
     public static BufferedImage loadImage(String imagePath) {
         try {
             File imageFile = new File(imagePath);
@@ -63,6 +115,12 @@ public class ImageUtils {
         }
     }
 
+    /**
+     * Mirrors the given image horizontally.
+     *
+     * @param image The input image to mirror.
+     * @return A new BufferedImage with horizontally mirrored pixels.
+     */
     public static BufferedImage mirrorImage(BufferedImage image) {
         int width = image.getWidth();
         int height = image.getHeight();

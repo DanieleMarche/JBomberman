@@ -1,19 +1,17 @@
 package main;
 
 import Animation.AnimationMessages;
+import Animation.Drawable;
 import Controllers.*;
 import TopBar.TopBar;
 import User.UserModel;
-import entityGerarchy.Entity;
-import Bomberman.Player;
-import Tile.*;
-
-import Tile.tileGerarchy.Tile;
+import EntityModelGerarchy.Entity;
+import Bomberman.PlayerModel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Observable;
-import java.util.Observer;
+import java.awt.image.BufferedImage;
+import java.util.*;
 
 public class GameView extends JPanel implements Observer {
 
@@ -36,10 +34,11 @@ public class GameView extends JPanel implements Observer {
 
     CardLayout cardLayout;
     JFrame parentFrame;
-    JPanel parentPanel;
+    JFrame mainFrame;
+    JPanel mainPanel;
     UserModel usermodel;
 
-    public GameView(CardLayout cardLayout, JFrame parentFrame, JPanel parentPanel, UserModel usermodel) {
+    public GameView(CardLayout cardLayout, JFrame mainFrame, JFrame parentFrame, JPanel mainPanel, UserModel usermodel) {
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(screenWidth, screenHeight));
         setBackground(Color.gray);
@@ -47,15 +46,21 @@ public class GameView extends JPanel implements Observer {
         requestFocusInWindow();
 
         this.cardLayout = cardLayout;
-        this.parentPanel = parentPanel;
+        this.mainFrame = mainFrame;
+        this.mainPanel = mainPanel;
         this.parentFrame = parentFrame;
         this.usermodel = usermodel;
-
 
         setDoubleBuffered(true);
         setFocusable(true);
         requestFocus();
 
+    }
+
+    private void drawElement(Drawable e, Graphics2D g2) {
+        Optional<BufferedImage> image = e.getImage();
+        Point position = e.getPosition();
+        image.ifPresent(i -> g2.drawImage(i, position.x, position.y, i.getWidth() * GameView.tileScale, i.getHeight() * GameView.tileScale, null));
     }
 
     public void paintComponent(Graphics g) {
@@ -65,23 +70,25 @@ public class GameView extends JPanel implements Observer {
 
         AssetManager assetManager = AssetManager.getInstance();
 
-        if(assetManager.getMap() != null) assetManager.getMap().draw(g2);
+        if(assetManager.getMap() != null) {
+            Arrays.stream(assetManager.getMap().getMap())
+                    .flatMap(Arrays::stream)
+                    .toList().forEach(tile -> drawElement(tile, g2));
+        }
 
-        if(assetManager.getPortal() != null) assetManager.getPortal().draw(g2);
+        if(assetManager.getPortal() != null) drawElement(assetManager.getPortal(), g2);
 
-        assetManager.getBombs().forEach(b -> b.draw(g2));
+        assetManager.getBombs().forEach(b -> drawElement(b, g2));
 
-        assetManager.getDestructibleBlocks().forEach(db -> db.draw(g2));
+        assetManager.getPowerUps().forEach(pUps -> {drawElement(pUps, g2);});
 
-        assetManager.getPowerUps().forEach(pUps -> pUps.draw(g2));
+        assetManager.getFlames().forEach(flame -> drawElement(flame, g2));
 
-        assetManager.getFlames().forEach(flame -> flame.draw(g2));
+        assetManager.getEnemies().forEach(enemy -> drawElement(enemy, g2));
 
-        assetManager.getEnemies().forEach(enemy -> enemy.draw(g2));
+        drawElement(PlayerModel.getInstance(), g2);
 
-        Player.getInstance().draw(g2);
-
-        TopBar.getInstance().draw(g2);
+        drawElement(assetManager.getTopBar(), g2);
 
         g2.dispose();
 
@@ -92,26 +99,25 @@ public class GameView extends JPanel implements Observer {
         if(arg instanceof Entity) {
             repaint(((Entity) arg).getWorldPositionX(), ((Entity) arg).getWorldPositionY(), ((Entity) arg).getWidth(), ((Entity) arg).getHeight());
         }
-        if(arg instanceof Tile) {
-            repaint(((Tile) arg).getPositionXOnScreen(), ((Tile) arg).getPositionYOnScreen(), GameView.tileSize, GameView.tileSize);
-        }
         if(arg instanceof TopBar) {
             repaint(new Rectangle(0,0, GameView.screenWidth, GameView.topBarHeight));
         }
         if(arg == null) {
-            repaint(0, 0, GameView.screenWidth, GameView.screenHeight);
+            repaint();
         }
 
         if(arg instanceof AnimationMessages) {
             switch((AnimationMessages) arg) {
                 case GAME_WON -> {
-                    parentPanel.add(new LevelWonPanel(cardLayout, parentFrame, parentPanel), "LevelWonPanel");
-                    cardLayout.show(parentPanel, "LevelWonPanel");
+                    parentFrame.dispose();
+                    mainFrame.setVisible(true);
+                    cardLayout.show(mainPanel, "LevelWonPanel");
                 }
 
                 case GAME_LOST -> {
-                    parentPanel.add(new LostPanel(cardLayout, parentFrame, parentPanel, usermodel), "LostScreen");
-                    cardLayout.show(parentPanel, "LostScreen");
+                    parentFrame.dispose();
+                    mainFrame.setVisible(true);
+                    cardLayout.show(mainPanel, "LostScreen");
                 }
             }
         }

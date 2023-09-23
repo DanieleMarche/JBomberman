@@ -1,53 +1,61 @@
 package Tile;
 
-import Controllers.AssetManager;
 import Controllers.MapController;
-import entityGerarchy.Entity;
+import Tile.tileGerarchy.TileType;
+import EntityModelGerarchy.Entity;
 import main.GameLevel;
-import main.GameModel;
 import main.GameView;
 import Tile.tileGerarchy.Tile;
 
-import java.awt.*;
 import java.util.*;
 
 import static javax.imageio.ImageIO.read;
 
+
+/**
+ * The `Map` class represents the game map, which contains various types of tiles, including walkable blocks, limit blocks,
+ * destructible blocks, and solid blocks. It is responsible for loading the map, managing tiles, and providing access to
+ * map-related data.
+ *
+ * @Author Daniele Marchetilli
+ */
 public class Map extends Observable{
 
-    private static String plainMapPath = "res/Maps/plain-map.txt";
+    /**
+     * The directory on the resource folder where the plain map file is stored.
+     */
+    private static final String plainMapPath = "res/Maps/plain-map.txt";
 
+    /**
+     * The actual map based on a matrix of tiles.
+     */
     private final Tile[][] map;
 
     public Map(GameLevel gameLevel) {
-        addObserver(new MapController());
+        addObserver(MapController.getInstance());
 
         map = new Tile[GameView.maxWorldRow][GameView.maxWorldCol];
         loadMap(gameLevel);
-    }
-
-    private void printMap() {
-        for (Tile[] tiles : map) {
-            for (int x = 0; x < map[0].length; x++) {
-                if(tiles[x] instanceof LimitBlock) {
-                    if(((LimitBlock) tiles[x]).getImage() != null) {
-                        System.out.print("img" + " ");
-                    }
-                }
-
-            }
-            System.out.println();
-        }
     }
 
     public Tile[][] getMap() {
         return map;
     }
 
+    /**
+     * This function returns the type of the tile present of that position on the map.
+     * @param y the row of the tile.
+     * @param x the column of the tile.
+     * @return The type of the tile on that cohordinates.
+     */
     public TileType getMapTileType(int y, int x) {
         return map[y][x].getTileType();
     }
 
+    /**
+     * This function loads the matrix map taking a gamelevel as a parameter and using the map builder class
+     * to generate randomly the pieces with a free position.
+     */
     private void loadMap(GameLevel gameLevel) {
 
         TileType[][] mapTileNum = MapBuilder.getInstance().generateMap(gameLevel);
@@ -90,9 +98,11 @@ public class Map extends Observable{
             case WALKABLE_BLOCK -> {
                 if(!checkTile(row, col, tileType)) map[row][col] = WalkableBlock.getWalkableBlock(this, row, col);
                 if(map[row + 1][col].getTileType() == TileType.WALKABLE_BLOCK) {
+
                     WalkableBlock.reassignType(this, (WalkableBlock) map[row + 1][col]);
                     setChanged();
                     notifyObservers(map[row + 1][col]);
+
                 }
             }
             case LIMIT_BLOCK -> {
@@ -118,9 +128,6 @@ public class Map extends Observable{
     }
 
 
-
-
-
     /**
      * This function get as a parameter an entity and return the tiles surrounding it.
      * @param entity
@@ -137,13 +144,6 @@ public class Map extends Observable{
                 map[entityRow][entityCol - 1],
                 map[entityRow][ entityCol + 1]};
 
-    }
-
-
-    public void draw(Graphics2D g2) {
-        Arrays.stream(map).toList()
-                .forEach(tiles -> Arrays.stream(tiles)
-                                .forEach(tile -> tile.draw(g2)));
     }
 
     public Tile getTile(int worldRow, int worldCol) {

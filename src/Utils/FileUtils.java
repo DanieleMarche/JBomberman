@@ -6,6 +6,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+
+/**
+ * This class contains some useful method referring files for this game.
+ */
 public class FileUtils {
 
     /**

@@ -1,7 +1,15 @@
 package Tile;
+import Tile.tileGerarchy.TileType;
 import Utils.ImageUtils;
 import Tile.tileGerarchy.SingleImageTile;
 
+
+/**
+ * The `WalkableBlock` class represents a walkable block tile in the game map. Walkable blocks can have different appearances
+ * based on their type and the tiles above them.
+ *
+ * @Author Daniele Marchetilli
+ */
 public class WalkableBlock extends SingleImageTile {
 
     private static final String directoryPath = "res/Blocks/walkable_block/walkable_block_0";
@@ -13,13 +21,13 @@ public class WalkableBlock extends SingleImageTile {
     }
 
     public static void reassignType(Map map, WalkableBlock walkableBlock) {
-        int row = walkableBlock.row;
-        int col = walkableBlock.col;
+        int row = walkableBlock.getRow();
+        int col = walkableBlock.getCol();
 
         switch (map.getTile(row - 1, col).getTileType()) {
-            case WALKABLE_BLOCK -> walkableBlock.image = ImageUtils.loadImage(directoryPath + "1.png");
-            case DESTRUCTIBLE_BLOCK -> walkableBlock.image = ImageUtils.loadImage(directoryPath + "3.png");
-            case LIMIT_BLOCK, SOLID_BLOCK -> walkableBlock.image = ImageUtils.loadImage(directoryPath + "2.png");
+            case WALKABLE_BLOCK -> walkableBlock.currentDisplayingImage = ImageUtils.loadImage(directoryPath + "1.png");
+            case DESTRUCTIBLE_BLOCK -> walkableBlock.currentDisplayingImage = ImageUtils.loadImage(directoryPath + "3.png");
+            case LIMIT_BLOCK, SOLID_BLOCK -> walkableBlock.currentDisplayingImage = ImageUtils.loadImage(directoryPath + "2.png");
         }
 
     }
@@ -52,7 +60,9 @@ public class WalkableBlock extends SingleImageTile {
         return walkableBlock;
     }
 
-
+    /**
+     * The `WalkableBlockType` enum defines different types of walkable blocks based on their appearance and the tiles above them.
+     */
 enum WalkableBlockType{
     UNDER_LIMIT_OR_SOLID_BLOCK,
     UNDER_DESTRUCTIBLE_BLOCK,

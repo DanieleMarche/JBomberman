@@ -1,5 +1,6 @@
 package Tile;
 
+import Tile.tileGerarchy.TileType;
 import main.GameLevel;
 import main.GameView;
 
@@ -9,6 +10,11 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Random;
 
+/**
+ * This class is used to generate randomly a map using a game level.
+ *
+ * @Author Daniele Marchetilli
+ */
 public class MapBuilder {
 
     private static MapBuilder instance = null;

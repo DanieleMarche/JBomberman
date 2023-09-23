@@ -1,13 +1,13 @@
 package Controllers;
 
 import Animation.AnimationMessages;
+import Bomberman.PlayerModel;
 import Controllers.ControllersGerarchy.CollectionOfEntitiesController;
-import enemy.Enemy;
-import Bomberman.Player;
+import enemy.EnemyModel;
 
 import java.util.Observable;
 
-public class EnemyController extends CollectionOfEntitiesController<Enemy> {
+public class EnemyController extends CollectionOfEntitiesController<EnemyModel> {
 
     private static EnemyController instance = null;
 
@@ -17,13 +17,13 @@ public class EnemyController extends CollectionOfEntitiesController<Enemy> {
     }
 
     private EnemyController() {
-        super(AssetManager.getInstance().getEnemies());
+        super();
 
         collisionChecker = (movingEntity) -> {
             entities.forEach(enemy -> {
                 if (CollisionDetector.checkcollisionBetweenMovingentityAndOtherEntity(movingEntity, enemy)) {
-                    if(movingEntity instanceof Player) {
-                        ((Player) movingEntity).die();
+                    if(movingEntity instanceof PlayerModel) {
+                        ((PlayerModel) movingEntity).die();
                     }
                 }
             });
@@ -35,16 +35,18 @@ public class EnemyController extends CollectionOfEntitiesController<Enemy> {
 
         switch((AnimationMessages) arg) {
             case REMOVE_ELEMENT -> {
-                Enemy enemy = (Enemy) o;
-                entities.remove(enemy);
-                Player.getInstance().addScore(enemy);
+                EnemyModel enemyModel = (EnemyModel) o;
+                entities.remove(enemyModel);
+                PlayerModel.getInstance().addScore(enemyModel);
+
                 setChanged();
-                notifyObservers(enemy);
+                notifyObservers();
+
             }
             case REPAINT_GAME ->    {
-                Enemy enemy = (Enemy) o;
+                EnemyModel enemyModel = (EnemyModel) o;
                 setChanged();
-                notifyObservers(enemy);
+                notifyObservers(enemyModel);
             }
             case GAME_LOST, GAME_WON -> entities.clear();
 

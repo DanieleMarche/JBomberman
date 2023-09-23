@@ -1,47 +1,66 @@
 package Controllers;
 
-import Bomb.Bomb;
-import Bomberman.Player;
+import Animation.Drawable;
+import Controllers.ControllersGerarchy.BombController;
+import Bomb.BombModel;
+import Bomberman.PlayerModel;
 import Explosion.Explosion;
 import Flames.Flame;
-import Portal.Portal;
+import Portal.PortalController;
+import Portal.PortalModel;
 import PowerUp.*;
-import TopBar.TopBar;
+import Tile.tileGerarchy.AnimatedTile;
+import TopBar.*;
 import User.UserModel;
 import enemy.Denkyus;
-import enemy.Enemy;
+import enemy.EnemyModel;
 import enemy.Puropen;
+import EntityModelGerarchy.MovingEntity;
+import EntityModelGerarchy.NotMovingAnimatedEntity;
 import main.GameLevel;
 import main.GameView;
 import Tile.DestructibleBlock;
 import Tile.Map;
-import Tile.TileType;
+import Tile.tileGerarchy.TileType;
 
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * The AssetManager class is responsible for managing assets such as the player, enemies,
+ * power-ups, bombs, flames, and more. It acts as a central repository for these game objects and ensures
+ * they are properly synchronized and updated throughout the game.
+ *
+ * @Author Daniele Marchetilli
+ *
+ */
 public class AssetManager {
 
     private static AssetManager instance = null;
     private final GameLevel gameLevel;
 
-    private Player player;
+    private ArrayList<Drawable> drawables;
 
+    private PlayerModel playerModel;
+
+    private TopBar topBar;
     private final ArrayList<Flame> flames;
 
     private final ArrayList<Explosion> explosions;
 
-    private ArrayList<Enemy> enemies;
+    private ArrayList<EnemyModel> enemies;
 
-    private ArrayList<PowerUp> powerUps;
+    private ArrayList<PowerUpModel> powerUpModels;
 
-    private Portal portal;
+    private PortalModel portalModel;
 
     private Map map;
 
     private ArrayList<DestructibleBlock> destructibleBlocks;
 
-    private final ArrayList<Bomb> bombs;
+    private final LevelTimer levelTimer;
+
+    private final ArrayList<BombModel> bombModels;
 
     public static AssetManager getInstance() {
         if(instance == null) {
@@ -51,40 +70,73 @@ public class AssetManager {
     }
 
     private AssetManager() {
+        drawables = new ArrayList<>();
+        this.levelTimer = LevelTimer.getInstance();
+        this.topBar = new TopBar();
+        TopBarController.getInstance().setTopBar(topBar);
         gameLevel = UserModel.getInstance().getLivelloRaggiunto();
+
         flames = new ArrayList<>();
+        FlameController.getInstance().setEntities(flames);
+
         explosions = new ArrayList<>();
-        bombs = new ArrayList<>();
+        ExplosionController.getInstance().setExplosions(explosions);
+
+        bombModels = new ArrayList<>();
+        BombController.getInstance().setEntities(bombModels);
+
         destructibleBlocks = new ArrayList<>();
+        DestructibleBlocksController.getInstance().setTiles(destructibleBlocks);
+
         enemies = new ArrayList<>();
-        powerUps = new ArrayList<>();
+        EnemyController.getInstance().setEntities(enemies);
+
+        powerUpModels = new ArrayList<>();
+        PowerUpsController.getInstance().setEntities(powerUpModels);
     }
 
+    public LevelTimer getLevelTimer() {
+        return levelTimer;
+    }
+
+    public TopBar getTopBar() {
+        return topBar;
+    }
+
+
+    /**
+     * This function takes a map as input and add it to its map property, then it generates the powerUps of the game,
+     * the portal and the enemies.
+     * @param map
+     */
     public void setMap(Map map) {
         this.map = map;
-        powerUps.addAll(setPowerUps());
-        portal = addPortal(map);
-        PortalController.getInstance().setEntity(portal);
-        //enemies.addAll(addEnemies(map));
+        powerUpModels.addAll(setPowerUps());
+        portalModel = addPortal(map);
+        PortalController.getInstance().setEntity(portalModel);
+        enemies.addAll(addEnemies(map));
     }
 
+    /**
+     * This function removes the instance of the AssetManager removing also the instances of the Player class and the
+     * Portal class.
+     */
     public static void removeInstance() {
-        Portal.removeInstance();
-        Player.removeInstance();
-        TopBar.removeInstance();
+        PortalModel.removeInstance();
+        PlayerModel.removeInstance();
         instance = null;
     }
 
-    public ArrayList<Bomb> getBombs() {
-        return bombs;
+    public ArrayList<BombModel> getBombs() {
+        return bombModels;
     }
 
     public GameLevel getGameLevel() {
         return gameLevel;
     }
 
-    public Player getPlayer() {
-        return player;
+    public PlayerModel getPlayer() {
+        return playerModel;
     }
 
     public ArrayList<Flame> getFlames() {
@@ -95,16 +147,16 @@ public class AssetManager {
         return explosions;
     }
 
-    public ArrayList<Enemy> getEnemies() {
+    public ArrayList<EnemyModel> getEnemies() {
         return enemies;
     }
 
-    public ArrayList<PowerUp> getPowerUps() {
-        return powerUps;
+    public ArrayList<PowerUpModel> getPowerUps() {
+        return powerUpModels;
     }
 
-    public Portal getPortal() {
-        return portal;
+    public PortalModel getPortal() {
+        return portalModel;
     }
 
     public Map getMap() {
@@ -115,9 +167,13 @@ public class AssetManager {
         return destructibleBlocks;
     }
 
-    private ArrayList<PowerUp> setPowerUps() {
+    /**
+     * This function randomly generates the powerUp position of this lebvel.
+     * @return the Arraylist with the generated PowerUps
+     */
+    private ArrayList<PowerUpModel> setPowerUps() {
 
-        ArrayList<PowerUp> res = new ArrayList<>();
+        ArrayList<PowerUpModel> res = new ArrayList<>();
 
         res.addAll(setPowerUpsByTypes(gameLevel.getNumberOfBombPowerUps(), PowerUpType.MORE_BOMB_AT_SAME_TIME));
         res.addAll(setPowerUpsByTypes(gameLevel.getNumberOfFlamePowerUps(), PowerUpType.MORE_FLAME));
@@ -126,8 +182,14 @@ public class AssetManager {
         return res;
     }
 
-    private ArrayList<PowerUp> setPowerUpsByTypes(int n, PowerUpType type) {
-        ArrayList<PowerUp> res = new ArrayList<>();
+    /**
+     * This function ta
+     * @param n number of PowerUps to generate
+     * @param type the type the powerups will have
+     * @return an Arraylist containing the generated power ups.
+     */
+    private ArrayList<PowerUpModel> setPowerUpsByTypes(int n, PowerUpType type) {
+        ArrayList<PowerUpModel> res = new ArrayList<>();
 
         Random random = new Random();
 
@@ -137,17 +199,22 @@ public class AssetManager {
             DestructibleBlock selectedBlock = destructibleBlocks.get(randomIndex);
 
             if (selectedBlock != null) {
-                if(selectedBlock.getPowerUp() != null) continue;
-                PowerUp selectedPowerUp = new PowerUp(selectedBlock.getPositionXOnScreen(), selectedBlock.getPositionYOnScreen() - GameView.topBarHeight, type);
-                selectedBlock.addPowerUp(selectedPowerUp);
-                res.add(selectedPowerUp);
+                if(selectedBlock.getPowerUp().isPresent()) continue;
+                PowerUpModel selectedPowerUpModel = new PowerUpModel(selectedBlock.getWorldPositionX(), selectedBlock.getWorldPositionY() - GameView.topBarHeight, type);
+                selectedBlock.addPowerUp(selectedPowerUpModel);
+                res.add(selectedPowerUpModel);
                 i++;
             }
         }
         return res;
     }
 
-    private Portal addPortal(Map map) {
+    /**
+     * This function generate the portal position for the map.
+     * @param map the map of the level.
+     * @return the generated portal.
+     */
+    private PortalModel addPortal(Map map) {
 
         int n = 1;
         int i = 0;
@@ -158,44 +225,51 @@ public class AssetManager {
             int col = r.nextInt(GameView.maxWorldCol);
 
             if(map.getMapTileType(row, col) == TileType.WALKABLE_BLOCK) {
-                Portal.getInstance(row, col).setVisibility(true);
+                PortalModel.getInstance(row, col).setVisiblility(true);
                 i++;
             }
 
             else if (map.getMapTileType(row, col) == TileType.DESTRUCTIBLE_BLOCK ) {
                 DestructibleBlock db = (DestructibleBlock) map.getTile(row, col);
-                if(!db.hasPoweUp()) db.addPortal(Portal.getInstance(row, col));
+                if(db.getPowerUp().isEmpty()) db.addPortal(PortalModel.getInstance(row, col));
                 i++;
             }
         }
-        return Portal.getInstance();
+        return PortalModel.getInstance();
     }
 
-    private ArrayList<Enemy> addEnemies(Map map) {
+    /**
+     * This function randomly finds the position of the level enemies.
+     * @param map the level map.
+     * @return an arraylist containing the generated enemies.
+     */
+    private ArrayList<EnemyModel> addEnemies(Map map) {
 
-        ArrayList<Enemy> res = new ArrayList<>();
+        ArrayList<EnemyModel> res = new ArrayList<>();
         int numberOfPuropens = gameLevel.getNumberOfPuropens();
         int numberOfDenkyuses = gameLevel.getNumberOfDenkyuses();
 
+        //generates the puropens
         while(numberOfPuropens > 0) {
             Random r = new Random();
             int row = r.nextInt(1, GameView.maxWorldRow - 2);
             int col = r.nextInt(2, GameView.maxWorldCol - 3);
 
             if(!(row == 1 && col == 2) && !(row == 1 && col == 3) && !(row == 2 && col == 2) && map.getMapTileType(row, col) == TileType.WALKABLE_BLOCK) {
-                if(!Enemy.checkEnemyPresence(row, col, res))  res.add(new Puropen(row, col));
+                if(!EnemyModel.checkEnemyPresence(row, col, res))  res.add(new Puropen(row, col));
                 numberOfPuropens--;
             }
 
         }
 
+        //generates the denkyus
         while(numberOfDenkyuses > 0) {
             Random r = new Random();
             int row = r.nextInt(1, GameView.maxWorldRow - 2);
             int col = r.nextInt(2, GameView.maxWorldCol - 3);
 
             if(!(row == 1 && col == 2) && !(row == 1 && col == 3) && !(row == 2 && col == 2) && map.getMapTileType(row, col) == TileType.WALKABLE_BLOCK) {
-                if(!Enemy.checkEnemyPresence(row, col, res)) res.add(new Denkyus(row, col));
+                if(!EnemyModel.checkEnemyPresence(row, col, res)) res.add(new Denkyus(row, col));
                 numberOfDenkyuses--;
             }
 
@@ -205,12 +279,12 @@ public class AssetManager {
 
     }
 
-    public void setPlayer(Player player) {
-        this.player = player;
+    public void setPlayer(PlayerModel playerModel) {
+        this.playerModel = playerModel;
     }
 
-    public void addBomb(Bomb b) {
-        bombs.add(b);
+    public void addBomb(BombModel b) {
+        bombModels.add(b);
     }
 
     public  void addExplosion(Explosion e) {
@@ -223,5 +297,32 @@ public class AssetManager {
 
     public void addDestructibleBlock(DestructibleBlock db) {
         destructibleBlocks.add(db);
+    }
+
+    public void addDrawable(Drawable d) {
+        drawables.add(d);
+    }
+
+    public void removeDrawable(Drawable d) {
+        drawables.remove(d);
+    }
+
+    public void pause() {
+        levelTimer.pause();
+        bombModels.forEach(NotMovingAnimatedEntity::pause);
+        flames.forEach(NotMovingAnimatedEntity::pause);
+        destructibleBlocks.forEach(AnimatedTile::pause);
+        enemies.forEach(MovingEntity::pause);
+        playerModel.pause();
+
+    }
+
+    public void resume() {
+        if(levelTimer.isPaused()) levelTimer.resume();
+        bombModels.forEach(NotMovingAnimatedEntity::resume);
+        flames.forEach(NotMovingAnimatedEntity::resume);
+        destructibleBlocks.forEach(AnimatedTile::resume);
+        enemies.forEach(MovingEntity::resume);
+        playerModel.resume();
     }
 }

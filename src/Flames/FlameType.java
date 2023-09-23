@@ -1,5 +1,9 @@
 package Flames;
 
+/**
+ * This enum class defines the different types of flames present in this game and
+ * every instance contains the path to its animation.
+ */
 public enum FlameType {
 
     BOMB_FLAME("res/Bomb/bomb_explosion"),
