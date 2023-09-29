@@ -39,8 +39,8 @@ public class UserCreationPanel extends JPanel {
         add(usernamePanel);
 
         BufferedImage whiteAvatar = ImageUtils.loadImage("res/bombermanSprites/white/front/bomberman_front_02.png");
-        BufferedImage redAvatar = ImageUtils.loadImage("res/bombermanSprites/red/front/red-bomberman-front-1.png");
-        BufferedImage blackAvatar = ImageUtils.loadImage("res/bombermanSprites/black/front/black-bomberman-front-1.png");
+        BufferedImage redAvatar = ImageUtils.loadImage("res/bombermanSprites/red/front/red-bomberman-front-2.png");
+        BufferedImage blackAvatar = ImageUtils.loadImage("res/bombermanSprites/black/front/black-bomberman-front-2.png");
 
         whiteAvatar = scaleImage(whiteAvatar, 16 * 2, 24 * 2); // Scala l'immagine
         redAvatar = scaleImage(redAvatar, 16 * 2, 24 * 2);
