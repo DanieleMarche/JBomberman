@@ -21,25 +21,43 @@ public class LevelWonPanel extends JPanel implements ActionListener {
 
     JPanel parentPanel;
 
-    public LevelWonPanel(CardLayout cardLayout, JFrame parentFrame, JPanel parentPanel) {
+    public LevelWonPanel(CardLayout cardLayout, JFrame parentFrame, JPanel parentPanel, UserModel user) {
         setPreferredSize(new Dimension(400, 400));
-        setLayout(new BorderLayout());
+        setLayout(new GridBagLayout());
         this.cardLayout = cardLayout;
         this.parentPanel = parentPanel;
         this.parentFrame = parentFrame;
 
-        UserModel user = UserModel.getInstance();
-
         titleLabel = new JLabel("Livello superato!");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        add(titleLabel, BorderLayout.NORTH);
+
+        // Create a GridBagConstraints to center components
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0; // Make components expand horizontally
+        gbc.insets = new Insets(10, 10, 10, 10); // Add some padding
+
+        // Add titleLabel at the top
+        gbc.anchor = GridBagConstraints.PAGE_START;
+
+        add(titleLabel, gbc);
 
         JPanel buttonPanel = new JPanel(new FlowLayout());
 
         nextLevelButton = new JButton("Gioca il livello " + user.getLivelloRaggiunto());
         nextLevelButton.addActionListener(this);
+
+        mainMenuButton = new JButton("Torna al menu principale");
+        mainMenuButton.addActionListener(this);
+
         buttonPanel.add(nextLevelButton);
+        buttonPanel.add(mainMenuButton);
+
+        // Add buttonPanel in the center
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.CENTER;
+        add(buttonPanel, gbc);
 
         user.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
@@ -51,17 +69,6 @@ public class LevelWonPanel extends JPanel implements ActionListener {
             }
         });
 
-        mainMenuButton = new JButton("Torna al menu principale");
-        mainMenuButton.addActionListener(this);
-        buttonPanel.add(mainMenuButton);
-
-        // Aggiunta di uno spazio vuoto in basso per centrare il contenuto
-        add(Box.createVerticalStrut(100), BorderLayout.SOUTH);
-
-        // Aggiunta di uno spazio vuoto a sinistra per centrare il contenuto
-        add(Box.createHorizontalStrut(100), BorderLayout.WEST);
-
-        add(buttonPanel, BorderLayout.CENTER);
         parentFrame.pack();
     }
 
@@ -82,12 +89,12 @@ public class LevelWonPanel extends JPanel implements ActionListener {
                 JFrame frame = new JFrame("Level Won Test");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setSize(400, 400);
-                frame.setResizable(false);
+
 
                 CardLayout cardLayout = new CardLayout();
                 JPanel parentPanel = new JPanel(cardLayout);
 
-                LevelWonPanel levelWonPanel = new LevelWonPanel(cardLayout, frame, parentPanel);
+                LevelWonPanel levelWonPanel = new LevelWonPanel(cardLayout, frame, parentPanel, UserModel.getInstance());
 
                 parentPanel.add(levelWonPanel, "LevelWonPanel");
 
