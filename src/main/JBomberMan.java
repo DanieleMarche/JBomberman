@@ -44,11 +44,9 @@ public class JBomberMan {
 
         contentPanel.add(new Statistiche(cardLayout, contentPanel, UserModel.getInstance()), "StatisticsPage");
 
-        contentPanel.add(new LevelWonPanel(cardLayout, window, contentPanel), "LevelWonPanel");
+        contentPanel.add(new LevelWonPanel(cardLayout, window, contentPanel, UserModel.getInstance()), "LevelWonPanel");
 
         contentPanel.add(new LostPanel(cardLayout, window, contentPanel, UserModel.getInstance()), "LostScreen");
-
-
 
         window.add(contentPanel);
         window.pack();
