@@ -45,7 +45,7 @@ public class LevelWonPanel extends JPanel implements ActionListener {
 
         JPanel buttonPanel = new JPanel(new FlowLayout());
 
-        nextLevelButton = new JButton("Gioca il livello " + user.getLivelloRaggiunto());
+        nextLevelButton = new JButton("Gioca il livello " + user.getLivelloRaggiunto().getLevelCode());
         nextLevelButton.addActionListener(this);
 
         mainMenuButton = new JButton("Torna al menu principale");
@@ -86,7 +86,7 @@ public class LevelWonPanel extends JPanel implements ActionListener {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                JFrame frame = new JFrame("Level Won Test");
+                JFrame frame = new JFrame("JBomberman");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setSize(400, 400);
 

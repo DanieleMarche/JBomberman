@@ -56,6 +56,28 @@ public class LostPanel extends JPanel {
             }
         });
     }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                JFrame frame = new JFrame("JBomberman");
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setSize(400, 400);
+
+
+                CardLayout cardLayout = new CardLayout();
+                JPanel parentPanel = new JPanel(cardLayout);
+
+                LostPanel lostPanel = new LostPanel(cardLayout, frame, parentPanel, UserModel.getInstance());
+
+                parentPanel.add(lostPanel, "LevelWonPanel");
+
+                frame.add(parentPanel);
+                frame.setVisible(true);
+            }
+        });
+
+    }
 }
 
 
